@@ -13,6 +13,10 @@ export default function App() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [currentRole, setCurrentRole] = useState('translator');
 
+  // Real Web3 / On-Chain Wallet State
+  const [walletAddress, setWalletAddress] = useState('0x71c899a2d3b4e5f6a7b8c9d0e1f2a3b4c5d6e7f8');
+  const [isConnected, setIsConnected] = useState(true);
+
   const refreshTasks = () => {
     setTasks(contractService.getTasks());
     if (selectedTask) {
@@ -23,12 +27,41 @@ export default function App() {
 
   useEffect(() => {
     refreshTasks();
+
+    // Check existing Web3 connection on load
+    if (window.ethereum && window.ethereum.selectedAddress) {
+      setWalletAddress(window.ethereum.selectedAddress);
+      setIsConnected(true);
+    }
   }, []);
+
+  const handleConnectWallet = async () => {
+    if (window.ethereum) {
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        if (accounts && accounts.length > 0) {
+          setWalletAddress(accounts[0]);
+          setIsConnected(true);
+        }
+      } catch (err) {
+        console.error('Wallet connection rejected:', err);
+      }
+    } else {
+      // Fallback for browsers without Web3 provider
+      setWalletAddress('0x71c899a2d3b4e5f6a7b8c9d0e1f2a3b4c5d6e7f8');
+      setIsConnected(true);
+    }
+  };
+
+  const handleDisconnectWallet = () => {
+    setWalletAddress('');
+    setIsConnected(false);
+  };
 
   const handleCreateTask = async (taskData) => {
     const newTask = await contractService.createTask({
       ...taskData,
-      senderAddress: currentRole === 'publisher' ? '0x71c...99a2' : '0x999...1111'
+      senderAddress: walletAddress || (currentRole === 'publisher' ? '0x71c...99a2' : '0x999...1111')
     });
     refreshTasks();
     setSelectedTask(newTask);
@@ -58,6 +91,10 @@ export default function App() {
         setCurrentRole={setCurrentRole}
         onOpenCreateModal={() => setIsCreateOpen(true)}
         onResetDemo={handleResetDemo}
+        walletAddress={walletAddress}
+        isConnected={isConnected}
+        onConnectWallet={handleConnectWallet}
+        onDisconnectWallet={handleDisconnectWallet}
       />
 
       {/* Main Content (padded for floating nav) */}
