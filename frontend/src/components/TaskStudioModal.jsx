@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   X, CheckCircle2, Clock, FileText, ArrowRight, 
-  Send, DollarSign, ExternalLink, Cpu, Check, AlertCircle, Scan
+  Send, DollarSign, ExternalLink, Cpu, Check, AlertCircle, Scan, Shield
 } from 'lucide-react';
 import { parseSubtitle } from '../utils/srtParser';
 import { ConsensusFeed } from './ConsensusFeed';
