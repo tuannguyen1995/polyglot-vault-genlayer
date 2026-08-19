@@ -17,7 +17,7 @@ export function TaskStudioModal({ task, onClose, walletAddress, onUpdateTask, co
   if (!task) return null;
 
   const [activeTab, setActiveTab] = useState('studio');
-  const [subtitleInput, setSubtitleInput] = useState(task.sample_subtitles || '');
+  const [subtitleInput, setSubtitleInput] = useState(task.subtitles || '');
   const [subtitleUrlInput, setSubtitleUrlInput] = useState(task.subtitle_url || 'https://storage.polyglotvault.io/subs/translated.srt');
   const [isProcessing, setIsProcessing] = useState(false);
   const [consensusSteps, setConsensusSteps] = useState([]);
@@ -25,7 +25,7 @@ export function TaskStudioModal({ task, onClose, walletAddress, onUpdateTask, co
   const [actionError, setActionError] = useState('');
   const [actionSuccess, setActionSuccess] = useState('');
 
-  const parsedCues = parseSubtitle(subtitleInput || task.sample_subtitles || '');
+  const parsedCues = parseSubtitle(subtitleInput || task.subtitles || '');
   const displayEscrow = formatGenAmount(task.escrow_amount || '0');
   const rawEscrowNum = Number(displayEscrow.replace(/,/g, '')) || 0;
   const minStake = Math.floor(rawEscrowNum * 0.2);

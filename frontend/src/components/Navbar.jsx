@@ -1,7 +1,7 @@
 import React from 'react';
 import { Globe, Cpu, Wallet, Layers, RefreshCw } from 'lucide-react';
 
-export function Navbar({ walletAddress, onConnectWallet, onDisconnectWallet, onOpenCreateModal, onResetDemo }) {
+export function Navbar({ walletAddress, onConnectWallet, onDisconnectWallet, onOpenCreateModal }) {
   return (
     <div className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-4 px-4 pointer-events-none">
       <header className="pointer-events-auto glass-panel rounded-full px-4 sm:px-6 h-16 flex items-center justify-between w-full max-w-7xl cyber-border">
