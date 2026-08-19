@@ -389,18 +389,30 @@ export function TaskStudioModal({ task, onClose, walletAddress, onUpdateTask, co
               )}
 
               {task.status === 'ESCALATED' && (
-                <div className="flex flex-wrap items-center gap-3 w-full p-4 rounded-xl bg-cyber-pink/5 border border-cyber-pink/20">
-                  <span className="text-[10px] text-cyber-pink font-mono uppercase tracking-widest font-bold">Arbitration:</span>
-                  <button onClick={() => handleResolveEscalation('RELEASE')} disabled={isProcessing} className="px-4 py-2 rounded-lg bg-cyber-green/20 text-cyber-green hover:bg-cyber-green text-[10px] hover:text-black font-mono font-bold uppercase transition-colors border border-cyber-green/30">
-                    Release to Translator
-                  </button>
-                  <button onClick={() => handleResolveEscalation('REFUND')} disabled={isProcessing} className="px-4 py-2 rounded-lg bg-cyber-pink/20 text-cyber-pink hover:bg-cyber-pink text-[10px] hover:text-black font-mono font-bold uppercase transition-colors border border-cyber-pink/30">
-                    Refund to Pub
-                  </button>
-                  <button onClick={() => handleResolveEscalation('SPLIT')} disabled={isProcessing} className="px-4 py-2 rounded-lg bg-cyber-purple/20 text-cyber-purple hover:bg-cyber-purple text-[10px] hover:text-white font-mono font-bold uppercase transition-colors border border-cyber-purple/30">
-                    Split 50/50
-                  </button>
-                </div>
+                isPublisher ? (
+                  <div className="flex flex-wrap items-center gap-3 w-full p-4 rounded-xl bg-cyber-pink/5 border border-cyber-pink/20">
+                    <span className="text-[10px] text-cyber-pink font-mono uppercase tracking-widest font-bold">Publisher Voluntary Action:</span>
+                    <button onClick={() => handleResolveEscalation('RELEASE')} disabled={isProcessing} className="px-4 py-2 rounded-lg bg-cyber-green/20 text-cyber-green hover:bg-cyber-green text-[10px] hover:text-black font-mono font-bold uppercase transition-colors border border-cyber-green/30">
+                      Release Escrow to Translator
+                    </button>
+                    <span className="text-[10px] font-mono text-slate-500 block w-full">
+                      (Voluntarily release funds to Translator. REFUND or SPLIT requires Platform Admin resolution)
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap items-center gap-3 w-full p-4 rounded-xl bg-cyber-pink/5 border border-cyber-pink/20">
+                    <span className="text-[10px] text-cyber-pink font-mono uppercase tracking-widest font-bold">Platform Admin Arbitration:</span>
+                    <button onClick={() => handleResolveEscalation('RELEASE')} disabled={isProcessing} className="px-4 py-2 rounded-lg bg-cyber-green/20 text-cyber-green hover:bg-cyber-green text-[10px] hover:text-black font-mono font-bold uppercase transition-colors border border-cyber-green/30">
+                      Release to Translator
+                    </button>
+                    <button onClick={() => handleResolveEscalation('REFUND')} disabled={isProcessing} className="px-4 py-2 rounded-lg bg-cyber-pink/20 text-cyber-pink hover:bg-cyber-pink text-[10px] hover:text-black font-mono font-bold uppercase transition-colors border border-cyber-pink/30">
+                      Refund to Pub
+                    </button>
+                    <button onClick={() => handleResolveEscalation('SPLIT')} disabled={isProcessing} className="px-4 py-2 rounded-lg bg-cyber-purple/20 text-cyber-purple hover:bg-cyber-purple text-[10px] hover:text-white font-mono font-bold uppercase transition-colors border border-cyber-purple/30">
+                      Split 50/50
+                    </button>
+                  </div>
+                )
               )}
 
               {task.status === 'CLOSED' && (
