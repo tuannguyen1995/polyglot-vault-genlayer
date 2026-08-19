@@ -92,11 +92,24 @@ class ContractService {
     return tasks.find(t => t.id === id);
   }
 
+  async waitForTxOrState(hash, checkFn, retries = 10, delay = 2000) {
+    try {
+      await this.client.waitForTransactionReceipt({ hash, retries: 15, interval: 2000 });
+    } catch (err) {
+      console.warn('waitForTransactionReceipt polling notice (polling state directly):', err);
+    }
+
+    for (let i = 0; i < retries; i++) {
+      const res = await checkFn();
+      if (res) return res;
+      await new Promise(r => setTimeout(r, delay));
+    }
+    return checkFn();
+  }
+
   async createTask({ taskId, mediaUrl, targetLang, guidelines, blacklistWords, escrowAmount, senderAddress }) {
     await ensureGenLayerNetwork();
     const client = this.getClient(senderAddress);
-    
-    // Parse 100 GEN -> 100000000000000000000 wei (18 decimals)
     const val = parseGenAmount(escrowAmount);
 
     const hash = await client.writeContract({
@@ -106,8 +119,7 @@ class ContractService {
       value: val,
     });
 
-    await this.client.waitForTransactionReceipt({ hash });
-    return this.getTaskById(taskId);
+    return this.waitForTxOrState(hash, () => this.getTaskById(taskId));
   }
 
   async acceptTask(taskId, stakeAmount, senderAddress) {
@@ -122,8 +134,7 @@ class ContractService {
       value: val,
     });
 
-    await this.client.waitForTransactionReceipt({ hash });
-    return this.getTaskById(taskId);
+    return this.waitForTxOrState(hash, () => this.getTaskById(taskId));
   }
 
   async submitDeliverable(taskId, subtitleUrl, senderAddress) {
@@ -136,8 +147,7 @@ class ContractService {
       args: [taskId, subtitleUrl],
     });
 
-    await this.client.waitForTransactionReceipt({ hash });
-    return this.getTaskById(taskId);
+    return this.waitForTxOrState(hash, () => this.getTaskById(taskId));
   }
 
   async finalizePayout(taskId, senderAddress) {
@@ -150,8 +160,7 @@ class ContractService {
       args: [taskId],
     });
 
-    await this.client.waitForTransactionReceipt({ hash });
-    return this.getTaskById(taskId);
+    return this.waitForTxOrState(hash, () => this.getTaskById(taskId));
   }
 
   async resolveEscalation(taskId, action, senderAddress) {
@@ -164,8 +173,7 @@ class ContractService {
       args: [taskId, action],
     });
 
-    await this.client.waitForTransactionReceipt({ hash });
-    return this.getTaskById(taskId);
+    return this.waitForTxOrState(hash, () => this.getTaskById(taskId));
   }
 }
 
