@@ -200,6 +200,7 @@ function MainApp() {
 
         <BountyExplorer
           tasks={tasks}
+          walletAddress={walletAddress}
           onSelectTask={(task) => setSelectedTask(task)}
           onOpenCreateModal={() => setIsCreateOpen(true)}
         />

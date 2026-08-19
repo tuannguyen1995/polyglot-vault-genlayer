@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Search, Globe, ArrowRight, AlertCircle, Plus } from 'lucide-react';
 import { formatGenAmount } from '../services/contractService';
 
-export function BountyExplorer({ tasks = [], onSelectTask, onOpenCreateModal }) {
+export function BountyExplorer({ tasks = [], onSelectTask, onOpenCreateModal, walletAddress }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
 
@@ -76,6 +76,8 @@ export function BountyExplorer({ tasks = [], onSelectTask, onOpenCreateModal }) 
             const displayEscrow = formatGenAmount(task.escrow_amount);
             const rawEscrowNum = Number(displayEscrow.replace(/,/g, '')) || 0;
             const minStake = Math.floor(rawEscrowNum * 0.2);
+            const isPub = Boolean(walletAddress && task.publisher && walletAddress.toLowerCase() === String(task.publisher).toLowerCase());
+            const isTrx = Boolean(walletAddress && task.translator && task.translator !== '0x0000000000000000000000000000000000000000' && walletAddress.toLowerCase() === String(task.translator).toLowerCase());
 
             return (
               <div
@@ -89,10 +91,14 @@ export function BountyExplorer({ tasks = [], onSelectTask, onOpenCreateModal }) 
 
                 <div>
                   <div className="flex items-center justify-between mb-4 relative z-10">
-                    <span className="font-mono text-xs font-bold text-slate-400 group-hover:text-cyber-blue transition-colors truncate max-w-[170px]">
+                    <span className="font-mono text-xs font-bold text-slate-400 group-hover:text-cyber-blue transition-colors truncate max-w-[140px]">
                       {task.id}
                     </span>
-                    {getStatusBadge(task.status)}
+                    <div className="flex items-center gap-1.5 flex-wrap justify-end">
+                      {isPub && <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-cyber-blue/20 text-cyber-blue border border-cyber-blue/40">YOUR BOUNTY</span>}
+                      {isTrx && <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-cyber-green/20 text-cyber-green border border-cyber-green/40">YOUR JOB</span>}
+                      {getStatusBadge(task.status)}
+                    </div>
                   </div>
 
                   <div className="flex items-center gap-2 mb-4 relative z-10">
