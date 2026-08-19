@@ -21,7 +21,7 @@ export function CreateTaskModal({ onClose, onCreateTask }) {
       setMediaUrl('https://cdn.polyglotvault.io/transcripts/vietnamese_pho_asmr.txt');
       setTargetLang('English to Vietnamese');
       setEscrowAmount('1200');
-      setGuidelines('Whisper / ASMR tone. Accurate Vietnamese spice names (hoa hồi, thảo quả, gừng nướng). Avoid literal robotic phrasing.');
+      setGuidelines('Whisper / ASMR tone. Accurate Vietnamese spice names (star anise, cardamom, grilled ginger). Avoid literal robotic phrasing.');
       setBlacklistWords('plastic, fake, junk, synthetic');
       setSourceTranscript(`[00:00:02] Welcome back to the culinary sanctuary.
 [00:00:08] Today we gently char fresh shallots and ginger over open embers.

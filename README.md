@@ -3,16 +3,18 @@
 > **"PolyglotVault eliminates centralized localization gatekeepers by running multi-agent linguistic and timing adjudication directly inside GenLayer consensus."**
 
 [![GenLayer](https://img.shields.io/badge/GenLayer-Studionet-6366f1.svg)](https://studio.genlayer.com)
-[![Live dApp](https://img.shields.io/badge/Live_dApp-Vercel-emerald.svg)](https://frontend-six-olive-69.vercel.app)
-[![GitHub](https://img.shields.io/badge/GitHub-PolyglotVault-100000?logo=github&logoColor=white)](https://github.com/tuannguyenvan95/PolyglotVault)
+[![Live dApp](https://img.shields.io/badge/Live_dApp-Vercel-emerald.svg)](https://polyglot-vault-genlayer.vercel.app)
+[![GitHub](https://img.shields.io/badge/GitHub-PolyglotVault-100000?logo=github&logoColor=white)](https://github.com/tuannguyen1995/polyglot-vault-genlayer)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ---
 
 ## 🔗 Live Deployments & Links
 
-- **Live Production dApp**: [https://frontend-six-olive-69.vercel.app](https://frontend-six-olive-69.vercel.app)
-- **GitHub Repository**: [https://github.com/tuannguyenvan95/PolyglotVault](https://github.com/tuannguyenvan95/PolyglotVault)
+- **Live Production dApp**: [https://polyglot-vault-genlayer.vercel.app](https://polyglot-vault-genlayer.vercel.app)
+- **Deployed Intelligent Contract (Studionet)**: [`0xd96a39B15b2bb4E65BF09bf27A53165fEA637114`](https://genlayer-explorer.vercel.app/address/0xd96a39B15b2bb4E65BF09bf27A53165fEA637114)
+- **GenLayer Explorer Link**: [https://genlayer-explorer.vercel.app/address/0xd96a39B15b2bb4E65BF09bf27A53165fEA637114](https://genlayer-explorer.vercel.app/address/0xd96a39B15b2bb4E65BF09bf27A53165fEA637114)
+- **GitHub Repository**: [https://github.com/tuannguyen1995/polyglot-vault-genlayer](https://github.com/tuannguyen1995/polyglot-vault-genlayer)
 - **GenLayer Studio**: [https://studio.genlayer.com](https://studio.genlayer.com)
 
 ---
@@ -66,7 +68,7 @@
 ## 📁 Repository Structure
 
 ```
-PolyglotVault/
+polyglot-vault-genlayer/
 ├── contracts/
 │   └── PolyglotVault.py         # Intelligent Contract (GenLayer v0.2.18)
 ├── tests/
@@ -113,7 +115,7 @@ python -m unittest discover -s tests -p "test_*.py" -v
 
 ## 🚀 Deployment & Portal Submission Checklist
 
-1. **Deploy Contract**: Open [GenLayer Studio](https://studio.genlayer.com), paste `contracts/PolyglotVault.py`, deploy on `studionet`, and confirm transaction state is `Result: SUCCESS`.
-2. **Configure Frontend**: Update `VITE_CONTRACT_ADDRESS` on your Vercel deployment with the newly generated contract address.
-3. **Repository Setup**: GitHub repo contains `contracts/PolyglotVault.py`, `tests/test_polyglot_vault.py`, and `frontend/`.
+1. **Deployed Contract**: `0xd96a39B15b2bb4E65BF09bf27A53165fEA637114` on GenLayer `studionet`.
+2. **Live Application**: [https://polyglot-vault-genlayer.vercel.app](https://polyglot-vault-genlayer.vercel.app)
+3. **Repository Setup**: GitHub repo `polyglot-vault-genlayer` contains contract, test suite, and frontend.
 4. **Portal Submission**: Submit via **Portal -> Builders track** (`portal.genlayer.foundation`).

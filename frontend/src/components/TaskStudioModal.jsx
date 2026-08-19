@@ -230,7 +230,7 @@ export function TaskStudioModal({ task, onClose, currentRole, onUpdateTask, cont
                         <div key={cue.id} className="p-3 rounded-lg bg-black/60 border border-white/5 hover:border-white/10 transition-colors">
                           <div className="flex items-center justify-between text-[10px] text-slate-500 mb-2">
                             <span className="text-cyber-purple font-bold border border-cyber-purple/30 bg-cyber-purple/10 px-1.5 rounded">#{cue.id}</span>
-                            <span>{cue.start} ➔ {cue.end}</span>
+                            <span>{cue.start} &rarr; {cue.end}</span>
                           </div>
                           <p className="text-slate-300 text-xs leading-relaxed">{cue.text}</p>
                         </div>
