@@ -4,7 +4,7 @@ import { StatsBar } from './components/StatsBar';
 import { BountyExplorer } from './components/BountyExplorer';
 import { CreateTaskModal } from './components/CreateTaskModal';
 import { TaskStudioModal } from './components/TaskStudioModal';
-import { contractService } from './services/contractService';
+import { contractService, ensureGenLayerNetwork } from './services/contractService';
 import { Cpu, ShieldCheck, Sparkles, Terminal, CheckCircle2, Lock } from 'lucide-react';
 
 export default function App() {
@@ -16,6 +16,7 @@ export default function App() {
   const connectWallet = async () => {
     if (window.ethereum) {
       try {
+        await ensureGenLayerNetwork();
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         setWalletAddress(accounts[0].toLowerCase());
       } catch (err) {
@@ -30,10 +31,11 @@ export default function App() {
     setWalletAddress(null);
   };
 
-  const refreshTasks = () => {
-    setTasks(contractService.getTasks());
+  const refreshTasks = async () => {
+    const fetchedTasks = await contractService.getTasks();
+    setTasks(fetchedTasks);
     if (selectedTask) {
-      const updated = contractService.getTaskById(selectedTask.id);
+      const updated = fetchedTasks.find(t => t.id === selectedTask.id);
       setSelectedTask(updated || null);
     }
   };
