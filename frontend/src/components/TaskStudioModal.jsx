@@ -203,7 +203,7 @@ export function TaskStudioModal({ task, onClose, walletAddress, onUpdateTask, co
                 </div>
                 <div className="mt-4 pt-3 border-t border-white/5 text-[10px] font-mono text-slate-500 flex items-center justify-between uppercase tracking-widest">
                   <span>Pub: <span className="text-slate-300">{task.publisher.substring(0,12)}...</span></span>
-                  <span className="text-white font-bold bg-white/5 px-2 py-1 rounded border border-white/10">Reward: {task.escrow_amount} GEN</span>
+                  <span className="text-white font-bold bg-white/5 px-2 py-1 rounded border border-white/10">Reward: {displayEscrow} GEN</span>
                 </div>
               </div>
 
@@ -316,10 +316,16 @@ export function TaskStudioModal({ task, onClose, walletAddress, onUpdateTask, co
 
             <div className="flex flex-wrap items-center gap-3">
               {task.status === 'OPEN' && (
-                <button onClick={handleAcceptTask} disabled={isProcessing} className="px-5 py-3 rounded-xl bg-white text-black hover:bg-slate-200 disabled:opacity-50 text-xs font-display font-bold transition flex items-center gap-2 shadow-[0_0_15px_rgba(255,255,255,0.2)]">
-                  <DollarSign className="w-4 h-4" />
-                  <span>Lock {minStake} GEN & Accept</span>
-                </button>
+                walletAddress?.toLowerCase() === task.publisher?.toLowerCase() ? (
+                  <div className="px-4 py-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-mono">
+                    ⚡ You created this bounty (Publisher). Awaiting a Translator to lock {minStake} GEN stake & accept.
+                  </div>
+                ) : (
+                  <button onClick={handleAcceptTask} disabled={isProcessing} className="px-5 py-3 rounded-xl bg-white text-black hover:bg-slate-200 disabled:opacity-50 text-xs font-display font-bold transition flex items-center gap-2 shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+                    <DollarSign className="w-4 h-4" />
+                    <span>Lock {minStake} GEN & Accept</span>
+                  </button>
+                )
               )}
 
               {(task.status === 'IN_PROGRESS' || task.status === 'NEEDS_REVISION') && (

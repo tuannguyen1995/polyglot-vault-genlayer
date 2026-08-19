@@ -1,8 +1,13 @@
 import React from 'react';
 import { Lock, FileText, Cpu, ShieldCheck } from 'lucide-react';
+import { formatGenAmount } from '../services/contractService';
 
 export function StatsBar({ tasks = [] }) {
-  const totalEscrow = tasks.reduce((sum, t) => sum + (Number(t.escrow_amount) || 0), 0);
+  const totalEscrow = tasks.reduce((sum, t) => {
+    const formatted = formatGenAmount(t.escrow_amount);
+    const num = Number(formatted.replace(/,/g, '')) || 0;
+    return sum + num;
+  }, 0);
   const activeBounties = tasks.filter(t => t.status === 'OPEN' || t.status === 'IN_PROGRESS').length;
   const awaitingPayout = tasks.filter(t => t.status === 'AWAITING_PAYOUT').length;
 
