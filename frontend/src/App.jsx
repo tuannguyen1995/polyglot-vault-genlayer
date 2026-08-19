@@ -7,7 +7,52 @@ import { TaskStudioModal } from './components/TaskStudioModal';
 import { contractService, ensureGenLayerNetwork } from './services/contractService';
 import { Cpu, ShieldCheck, Sparkles, Terminal, CheckCircle2, Lock } from 'lucide-react';
 
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error("React ErrorBoundary caught an error:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-6 text-center font-mono">
+          <div className="p-8 rounded-2xl glass-panel border border-cyber-pink/30 max-w-lg space-y-4">
+            <h2 className="text-xl font-bold text-cyber-pink">System Display Recovered</h2>
+            <p className="text-xs text-slate-300 bg-black/60 p-4 rounded-xl border border-white/10 text-left overflow-auto max-h-40">
+              {String(this.state.error?.message || this.state.error)}
+            </p>
+            <button
+              onClick={() => { this.setState({ hasError: false }); window.location.reload(); }}
+              className="px-6 py-2.5 rounded-full bg-cyber-blue text-black font-bold text-xs hover:bg-white transition"
+            >
+              Reload dApp
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 export default function App() {
+  return (
+    <ErrorBoundary>
+      <MainApp />
+    </ErrorBoundary>
+  );
+}
+
+function MainApp() {
   const [tasks, setTasks] = useState([]);
   const [selectedTask, setSelectedTask] = useState(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);

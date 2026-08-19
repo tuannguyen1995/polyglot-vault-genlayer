@@ -6,11 +6,14 @@ export function BountyExplorer({ tasks = [], onSelectTask, onOpenCreateModal }) 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
 
-  const filteredTasks = tasks.filter(task => {
-    const matchesSearch = 
-      task.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      task.target_lang.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      task.guidelines.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredTasks = (tasks || []).filter(task => {
+    if (!task) return false;
+    const search = String(searchTerm || '').toLowerCase();
+    const taskId = String(task.id || '').toLowerCase();
+    const targetLang = String(task.target_lang || '').toLowerCase();
+    const guidelines = String(task.guidelines || '').toLowerCase();
+
+    const matchesSearch = taskId.includes(search) || targetLang.includes(search) || guidelines.includes(search);
     const matchesStatus = statusFilter === 'ALL' || task.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
