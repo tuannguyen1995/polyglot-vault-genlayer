@@ -6,8 +6,9 @@ import {
 import { parseSubtitle } from '../utils/srtParser';
 import { ConsensusFeed } from './ConsensusFeed';
 
-export function TaskStudioModal({ task, onClose, currentRole, onUpdateTask, contractService }) {
+export function TaskStudioModal({ task, onClose, walletAddress, onUpdateTask, contractService }) {
   if (!task) return null;
+  const currentRole = walletAddress === '0xadmin' ? 'admin' : (walletAddress === task.publisher ? 'publisher' : 'translator');
 
   const [activeTab, setActiveTab] = useState('studio');
   const [subtitleInput, setSubtitleInput] = useState(task.sample_subtitles || '');
@@ -298,7 +299,7 @@ export function TaskStudioModal({ task, onClose, currentRole, onUpdateTask, cont
           <div className="bg-black/60 p-5 rounded-2xl border border-white/10 cyber-border">
             <div className="flex items-center justify-between mb-4">
               <span className="text-[10px] font-mono font-bold text-white uppercase tracking-widest flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span> Action Terminal [{currentRole}]
+                <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span> Action Terminal [{walletAddress ? walletAddress.slice(0, 6) : 'DISCONNECTED'}]
               </span>
             </div>
 
@@ -339,7 +340,7 @@ export function TaskStudioModal({ task, onClose, currentRole, onUpdateTask, cont
                   <button onClick={() => handleResolveEscalation('RELEASE')} disabled={isProcessing} className="px-4 py-2 rounded-lg bg-cyber-green/20 text-cyber-green hover:bg-cyber-green text-[10px] hover:text-black font-mono font-bold uppercase transition-colors border border-cyber-green/30">
                     Release to Translator
                   </button>
-                  {currentRole === 'admin' && (
+                  {(task.status === 'ESCALATED' || task.status === 'DISPUTED') && (
                     <>
                       <button onClick={() => handleResolveEscalation('REFUND')} disabled={isProcessing} className="px-4 py-2 rounded-lg bg-cyber-pink/20 text-cyber-pink hover:bg-cyber-pink text-[10px] hover:text-black font-mono font-bold uppercase transition-colors border border-cyber-pink/30">
                         Refund to Pub

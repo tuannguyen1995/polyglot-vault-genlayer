@@ -11,11 +11,24 @@ export default function App() {
   const [tasks, setTasks] = useState([]);
   const [selectedTask, setSelectedTask] = useState(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [currentRole, setCurrentRole] = useState('translator');
+  const [walletAddress, setWalletAddress] = useState(null);
 
-  // Real Web3 / On-Chain Wallet State
-  const [walletAddress, setWalletAddress] = useState('0x71c899a2d3b4e5f6a7b8c9d0e1f2a3b4c5d6e7f8');
-  const [isConnected, setIsConnected] = useState(true);
+  const connectWallet = async () => {
+    if (window.ethereum) {
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        setWalletAddress(accounts[0].toLowerCase());
+      } catch (err) {
+        console.error(err);
+      }
+    } else {
+      alert("Please install a Web3 wallet like MetaMask.");
+    }
+  };
+
+  const disconnectWallet = () => {
+    setWalletAddress(null);
+  };
 
   const refreshTasks = () => {
     setTasks(contractService.getTasks());
@@ -27,41 +40,16 @@ export default function App() {
 
   useEffect(() => {
     refreshTasks();
-
-    // Check existing Web3 connection on load
-    if (window.ethereum && window.ethereum.selectedAddress) {
-      setWalletAddress(window.ethereum.selectedAddress);
-      setIsConnected(true);
-    }
   }, []);
 
-  const handleConnectWallet = async () => {
-    if (window.ethereum) {
-      try {
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        if (accounts && accounts.length > 0) {
-          setWalletAddress(accounts[0]);
-          setIsConnected(true);
-        }
-      } catch (err) {
-        console.error('Wallet connection rejected:', err);
-      }
-    } else {
-      // Fallback for browsers without Web3 provider
-      setWalletAddress('0x71c899a2d3b4e5f6a7b8c9d0e1f2a3b4c5d6e7f8');
-      setIsConnected(true);
-    }
-  };
-
-  const handleDisconnectWallet = () => {
-    setWalletAddress('');
-    setIsConnected(false);
-  };
-
   const handleCreateTask = async (taskData) => {
+    if (!walletAddress) {
+      alert("Please connect your wallet first.");
+      return;
+    }
     const newTask = await contractService.createTask({
       ...taskData,
-      senderAddress: walletAddress || (currentRole === 'publisher' ? '0x71c...99a2' : '0x999...1111')
+      senderAddress: walletAddress
     });
     refreshTasks();
     setSelectedTask(newTask);
@@ -87,14 +75,14 @@ export default function App() {
       <div className="absolute -bottom-40 left-1/2 w-96 h-96 bg-cyber-pink/20 rounded-full mix-blend-screen filter blur-[100px] animate-blob animation-delay-4000"></div>
 
       <Navbar
-        currentRole={currentRole}
-        setCurrentRole={setCurrentRole}
-        onOpenCreateModal={() => setIsCreateOpen(true)}
-        onResetDemo={handleResetDemo}
         walletAddress={walletAddress}
-        isConnected={isConnected}
-        onConnectWallet={handleConnectWallet}
-        onDisconnectWallet={handleDisconnectWallet}
+        onConnectWallet={connectWallet}
+        onDisconnectWallet={disconnectWallet}
+        onOpenCreateModal={() => {
+          if (!walletAddress) alert("Please connect wallet first.");
+          else setIsCreateOpen(true);
+        }}
+        onResetDemo={handleResetDemo}
       />
 
       {/* Main Content (padded for floating nav) */}
@@ -199,7 +187,7 @@ export default function App() {
         <TaskStudioModal
           task={selectedTask}
           onClose={() => setSelectedTask(null)}
-          currentRole={currentRole}
+          walletAddress={walletAddress}
           onUpdateTask={handleUpdateTask}
           contractService={contractService}
         />
