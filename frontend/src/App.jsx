@@ -60,12 +60,6 @@ export default function App() {
     setSelectedTask(updatedTask);
   };
 
-  const handleResetDemo = () => {
-    contractService.resetDemo();
-    refreshTasks();
-    setSelectedTask(null);
-  };
-
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col relative overflow-hidden bg-grid-pattern-lg">
       
@@ -82,7 +76,6 @@ export default function App() {
           if (!walletAddress) alert("Please connect wallet first.");
           else setIsCreateOpen(true);
         }}
-        onResetDemo={handleResetDemo}
       />
 
       {/* Main Content (padded for floating nav) */}

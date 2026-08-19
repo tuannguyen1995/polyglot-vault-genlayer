@@ -2,112 +2,7 @@
 
 const STORAGE_KEY = 'polyglot_vault_tasks_v1';
 
-const INITIAL_TASKS = [
-  {
-    id: 'task_asmr_cooking_01',
-    publisher: '0x71c...99a2',
-    translator: '0x0000000000000000000000000000000000000000',
-    escrow_amount: '1200',
-    translator_stake: '0',
-    status: 'OPEN',
-    media_url: 'https://cdn.polyglotvault.io/transcripts/vietnamese_pho_asmr.txt',
-    subtitle_url: '',
-    target_lang: 'English to Vietnamese',
-    guidelines: 'Maintain soothing whisper tone, accurately translate culinary spices (star anise, cardamom, charred ginger) and avoid awkward literal phrasing.',
-    blacklist_words: 'plastic, synthetic, garbage, junk food, cheap flavor',
-    verdict: 'NONE',
-    reason: 'Awaiting translator acceptance with 20% stake deposit',
-    confidence: '0',
-    attempts: '0',
-    payout_ready_at: '0',
-    disputed_at: '0',
-    source_transcript_preview: `[00:00:02] Welcome back to the culinary sanctuary.
-[00:00:08] Today we gently char fresh shallots and ginger over open embers.
-[00:00:15] Listen to the subtle sizzle as natural oils release their herbal sweetness.
-[00:00:24] We simmer marrow beef bones for 12 slow hours with whole star anise.
-[00:00:32] The broth must remain crystal clear, fragrant, and deeply comforting.`,
-    sample_subtitles: `1
-00:00:02,000 --> 00:00:07,000
-Chào mừng bạn quay trở lại với không gian ẩm thực yên bình.
-
-2
-00:00:08,000 --> 00:00:14,000
-Hôm nay chúng ta sẽ nướng nhẹ hành tím và gừng tươi trên than hồng.
-
-3
-00:00:15,000 --> 00:00:23,000
-Lắng nghe tiếng xèo xèo êm dịu khi tinh dầu tự nhiên tỏa ngát vị ngọt thảo mộc.
-
-4
-00:00:24,000 --> 00:00:31,000
-Chúng ta ninh xương bò tủy suốt 12 giờ chậm rãi cùng hoa hồi nguyên nhánh.
-
-5
-00:00:32,000 --> 00:00:38,000
-Nước dùng phải giữ được độ trong vắt, thơm nồng và ấm áp vỗ về.`
-  },
-  {
-    id: 'task_genlayer_developer_keynote',
-    publisher: '0x9a3...4e1b',
-    translator: '0x3f2...88cc',
-    escrow_amount: '2500',
-    translator_stake: '500',
-    status: 'AWAITING_PAYOUT',
-    media_url: 'https://cdn.polyglotvault.io/transcripts/genlayer_ai_consensus.txt',
-    subtitle_url: 'https://storage.polyglotvault.io/subs/genlayer_keynote_es.srt',
-    target_lang: 'English to Spanish',
-    guidelines: 'Preserve Web3 and consensus terminology accurately (Intelligent Contracts, subjective consensus, slashing). Formal developer-conference tone.',
-    blacklist_words: 'crypto scam, pump, casino, token mill',
-    verdict: 'APPROVED',
-    reason: 'Excellent Spanish terminology for GenLayer Intelligent Contracts and non-deterministic consensus. Zero blacklist infractions.',
-    confidence: '98',
-    attempts: '1',
-    payout_ready_at: String(Math.floor(Date.now() / 1000) - 3600), // Ready to finalize
-    disputed_at: '0',
-    source_transcript_preview: `[00:00:01] Welcome to the GenLayer Intelligent Contract demonstration.
-[00:00:06] Unlike standard EVM chains, GenLayer integrates LLMs directly into consensus.
-[00:00:14] Translators stake collateral and AI validators inspect translation quality on-chain.`,
-    sample_subtitles: `1
-00:00:01,000 --> 00:00:05,000
-Bienvenidos a la demostración de Contratos Inteligentes de GenLayer.
-
-2
-00:00:06,000 --> 00:00:13,000
-A diferencia de las cadenas EVM estándar, GenLayer integra LLMs directamente en el consenso.
-
-3
-00:00:14,000 --> 00:00:20,000
-Los traductores depositan garantías y los validadores de IA evalúan la calidad en la cadena.`
-  },
-  {
-    id: 'task_anime_sci_fi_dubbing',
-    publisher: '0x12c...8811',
-    translator: '0x55a...0099',
-    escrow_amount: '800',
-    translator_stake: '160',
-    status: 'NEEDS_REVISION',
-    media_url: 'https://cdn.polyglotvault.io/transcripts/cyberpunk_episode_4.txt',
-    subtitle_url: 'https://storage.polyglotvault.io/subs/cyberpunk_jp_attempt1.srt',
-    target_lang: 'Japanese to English',
-    guidelines: 'Maintain sci-fi cyberpunk grit and retro synth aesthetic. Avoid overly literal machine translations.',
-    blacklist_words: 'broken translation, google translate, lorem ipsum',
-    verdict: 'REFUND',
-    reason: 'Attempt 1 failed: Detected literal machine translation hallucination on line 4 ("Hyper-quantum reactor" translated into generic nonsense). Revision permitted.',
-    confidence: '91',
-    attempts: '1',
-    payout_ready_at: '0',
-    disputed_at: '0',
-    source_transcript_preview: `[00:00:05] Target acquired in Sector 7 sub-grid.
-[00:00:11] Emergency overrides failed. The neural core is melting down!`,
-    sample_subtitles: `1
-00:00:05,000 --> 00:00:10,000
-Target acquired in Sector 7 sub-grid.
-
-2
-00:00:11,000 --> 00:00:16,000
-Emergency cancel broken machine thing neural core is hot!`
-  }
-];
+const INITIAL_TASKS = [];
 
 class ContractService {
   constructor() {
@@ -380,11 +275,7 @@ class ContractService {
   }
 
   // Reset to initial demo dataset
-  resetDemo() {
-    this.tasks = INITIAL_TASKS;
-    this.saveTasks();
-    return this.tasks;
-  }
+  
 }
 
 export const contractService = new ContractService();
