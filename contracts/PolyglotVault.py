@@ -4,9 +4,6 @@ from genlayer import *
 from dataclasses import dataclass
 import json
 
-class UserError(Exception):
-    pass
-
 @allow_storage
 @dataclass
 class Task:
@@ -27,7 +24,7 @@ class Task:
     payout_ready_at: bigint
     disputed_at: bigint
 
-class PolyglotVault(gl.Contract):
+class Contract(gl.Contract):
     platform_admin: str
     tasks: TreeMap[str, Task]
     task_ids: DynArray[str]
@@ -36,7 +33,10 @@ class PolyglotVault(gl.Contract):
         self.platform_admin = str(gl.message.sender_address).lower()
 
     def _get_current_timestamp(self) -> bigint:
-        return gl.vm.get_timestamp()
+        dt = gl.message_raw["datetime"]
+        from datetime import datetime
+        ts = int(datetime.fromisoformat(dt.replace("Z", "+00:00")).timestamp())
+        return bigint(ts)
 
     def _parse_llm_json(self, response_str: str) -> dict:
         try:
@@ -124,14 +124,14 @@ class PolyglotVault(gl.Contract):
 
         def leader_fn() -> dict:
             try:
-                m_text = gl.nondet.web_render(m_url)
+                m_text = gl.nondet.web.render(m_url, mode="text")
                 if any(err in m_text[:400].lower() for err in ["404 not found", "error 404", "not found"]):
                     return {"verdict": "ESCALATE", "confidence": 100, "reason": "Source media URL is dead/404. Manual arbitration required."}
             except Exception as e:
                 return {"verdict": "ESCALATE", "confidence": 100, "reason": f"Media fetch failed: {str(e)}"}
 
             try:
-                s_text = gl.nondet.web_render(s_url)
+                s_text = gl.nondet.web.render(s_url, mode="text")
                 if any(err in s_text[:400].lower() for err in ["404 not found", "error 404", "not found"]):
                     return {"verdict": "REFUND", "confidence": 100, "reason": "Subtitle file URL is dead/404 or empty."}
             except Exception as e:
