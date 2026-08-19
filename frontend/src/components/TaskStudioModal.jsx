@@ -7,9 +7,14 @@ import { parseSubtitle } from '../utils/srtParser';
 import { ConsensusFeed } from './ConsensusFeed';
 import { formatGenAmount } from '../services/contractService';
 
+const safeAddr = (addr, len = 8) => {
+  if (!addr || typeof addr !== 'string') return '0x0000...';
+  if (addr === '0x0000000000000000000000000000000000000000') return 'None';
+  return addr.length > len ? `${addr.slice(0, len)}...` : addr;
+};
+
 export function TaskStudioModal({ task, onClose, walletAddress, onUpdateTask, contractService }) {
   if (!task) return null;
-  const currentRole = walletAddress === '0xadmin' ? 'admin' : (walletAddress === task.publisher ? 'publisher' : 'translator');
 
   const [activeTab, setActiveTab] = useState('studio');
   const [subtitleInput, setSubtitleInput] = useState(task.sample_subtitles || '');
@@ -20,8 +25,8 @@ export function TaskStudioModal({ task, onClose, walletAddress, onUpdateTask, co
   const [actionError, setActionError] = useState('');
   const [actionSuccess, setActionSuccess] = useState('');
 
-  const parsedCues = parseSubtitle(subtitleInput || task.sample_subtitles);
-  const displayEscrow = formatGenAmount(task.escrow_amount);
+  const parsedCues = parseSubtitle(subtitleInput || task.sample_subtitles || '');
+  const displayEscrow = formatGenAmount(task.escrow_amount || '0');
   const rawEscrowNum = Number(displayEscrow.replace(/,/g, '')) || 0;
   const minStake = Math.floor(rawEscrowNum * 0.2);
 
@@ -40,7 +45,7 @@ export function TaskStudioModal({ task, onClose, walletAddress, onUpdateTask, co
       case 'CLOSED':
         return <span className="px-2.5 py-1 rounded text-[10px] font-mono font-bold bg-slate-800 text-slate-400 border border-slate-700">CLOSED & SETTLED</span>;
       default:
-        return <span className="px-2.5 py-1 rounded text-[10px] font-mono font-bold bg-slate-800 text-slate-400 border border-slate-700">{status}</span>;
+        return <span className="px-2.5 py-1 rounded text-[10px] font-mono font-bold bg-slate-800 text-slate-400 border border-slate-700">{status || 'UNKNOWN'}</span>;
     }
   };
 
@@ -107,9 +112,8 @@ export function TaskStudioModal({ task, onClose, walletAddress, onUpdateTask, co
     finally { setIsProcessing(false); }
   };
 
-  const isPublisher = Boolean(walletAddress && task.publisher && walletAddress.toLowerCase() === task.publisher.toLowerCase());
-  const isAssignedTranslator = Boolean(walletAddress && task.translator && task.translator !== '0x0000000000000000000000000000000000000000' && walletAddress.toLowerCase() === task.translator.toLowerCase());
-  const isThirdParty = !isPublisher && !isAssignedTranslator;
+  const isPublisher = Boolean(walletAddress && task.publisher && walletAddress.toLowerCase() === String(task.publisher).toLowerCase());
+  const isAssignedTranslator = Boolean(walletAddress && task.translator && task.translator !== '0x0000000000000000000000000000000000000000' && walletAddress.toLowerCase() === String(task.translator).toLowerCase());
 
   const roleLabel = isPublisher 
     ? 'PUBLISHER (CREATOR)' 
@@ -128,7 +132,7 @@ export function TaskStudioModal({ task, onClose, walletAddress, onUpdateTask, co
               <Scan className="w-5 h-5 text-cyber-purple" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="font-mono font-bold text-lg text-white">{task.id}</h3>
                 {getStatusBadge(task.status)}
                 <span className={`px-2.5 py-0.5 rounded text-[10px] font-mono font-bold border ${
@@ -139,7 +143,7 @@ export function TaskStudioModal({ task, onClose, walletAddress, onUpdateTask, co
                   ROLE: {roleLabel}
                 </span>
               </div>
-              <p className="text-xs text-slate-400 font-mono">TARGET: <span className="text-white font-bold">{task.target_lang}</span></p>
+              <p className="text-xs text-slate-400 font-mono mt-1">TARGET: <span className="text-white font-bold">{task.target_lang || 'N/A'}</span></p>
             </div>
           </div>
 
@@ -211,16 +215,18 @@ export function TaskStudioModal({ task, onClose, walletAddress, onUpdateTask, co
                   <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-slate-500"></span> Source Transcript
                   </span>
-                  <a href={task.media_url} target="_blank" rel="noreferrer" className="text-[10px] font-mono text-cyber-blue hover:text-white flex items-center gap-1 transition-colors bg-cyber-blue/10 px-2 py-0.5 rounded border border-cyber-blue/20">
-                    gl.nondet.web.render <ExternalLink className="w-3 h-3" />
-                  </a>
+                  {task.media_url && (
+                    <a href={task.media_url} target="_blank" rel="noreferrer" className="text-[10px] font-mono text-cyber-blue hover:text-white flex items-center gap-1 transition-colors bg-cyber-blue/10 px-2 py-0.5 rounded border border-cyber-blue/20">
+                      gl.nondet.web.render <ExternalLink className="w-3 h-3" />
+                    </a>
+                  )}
                 </div>
                 <div className="bg-slate-950/80 rounded-xl p-4 text-xs font-mono text-slate-300 overflow-y-auto flex-1 border border-black shadow-inner whitespace-pre-wrap leading-relaxed relative">
                   <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.25)_50%)] bg-[length:100%_4px] pointer-events-none opacity-20"></div>
-                  {task.source_transcript_preview || '(No source preview)'}
+                  {task.source_transcript_preview || '(No source preview available)'}
                 </div>
                 <div className="mt-4 pt-3 border-t border-white/5 text-[10px] font-mono text-slate-500 flex items-center justify-between uppercase tracking-widest">
-                  <span>Pub: <span className="text-slate-300">{task.publisher.substring(0,12)}...</span></span>
+                  <span>Pub: <span className="text-slate-300">{safeAddr(task.publisher, 12)}</span></span>
                   <span className="text-white font-bold bg-white/5 px-2 py-1 rounded border border-white/10">Reward: {displayEscrow} GEN</span>
                 </div>
               </div>
@@ -269,14 +275,14 @@ export function TaskStudioModal({ task, onClose, walletAddress, onUpdateTask, co
                       <div className="text-slate-500 text-center py-16 font-mono text-xs space-y-2">
                         <p className="font-bold text-slate-400">NO DELIVERABLE SUBMITTED YET</p>
                         {task.status === 'OPEN' && <p>Awaiting a Translator to lock {minStake} GEN stake and accept.</p>}
-                        {task.status === 'IN_PROGRESS' && <p>Assigned Translator ({task.translator.slice(0,8)}...) is working on the subtitles.</p>}
+                        {task.status === 'IN_PROGRESS' && <p>Assigned Translator ({safeAddr(task.translator, 8)}) is working on the subtitles.</p>}
                       </div>
                     )}
                   </div>
                 )}
 
                 <div className="mt-4 pt-3 border-t border-white/5 text-[10px] font-mono text-slate-500 flex items-center justify-between uppercase tracking-widest">
-                  <span>Trx: <span className="text-slate-300">{task.translator === '0x0000000000000000000000000000000000000000' ? 'None' : task.translator.substring(0,12)+'...'}</span></span>
+                  <span>Trx: <span className="text-slate-300">{safeAddr(task.translator, 12)}</span></span>
                   <span className="text-cyber-green font-bold bg-cyber-green/10 px-2 py-1 rounded border border-cyber-green/20">Stake: {minStake} GEN</span>
                 </div>
               </div>
@@ -287,7 +293,7 @@ export function TaskStudioModal({ task, onClose, walletAddress, onUpdateTask, co
           {activeTab === 'consensus' && (
             <div className="space-y-6 max-w-4xl mx-auto">
               <ConsensusFeed steps={consensusSteps} activeStepIndex={activeStep} isRunning={isProcessing} />
-              {task.verdict !== 'NONE' && (
+              {task.verdict && task.verdict !== 'NONE' && (
                 <div className="p-5 rounded-2xl bg-black/40 border border-white/5">
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest">Final Adjudication</span>
@@ -297,11 +303,11 @@ export function TaskStudioModal({ task, onClose, walletAddress, onUpdateTask, co
                       task.verdict === 'REFUND' ? 'bg-cyber-pink/10 text-cyber-pink border border-cyber-pink/30 shadow-[0_0_10px_rgba(255,0,85,0.2)]' :
                       'bg-cyber-purple/10 text-cyber-purple border border-cyber-purple/30 shadow-[0_0_10px_rgba(176,38,255,0.2)]'
                     }`}>
-                      {task.verdict} / {task.confidence}% CONF
+                      {task.verdict} / {task.confidence || 0}% CONF
                     </span>
                   </div>
                   <p className="text-xs text-slate-300 font-mono bg-slate-950 p-4 rounded-xl border border-black shadow-inner leading-relaxed">
-                    &gt; {task.reason}
+                    &gt; {task.reason || 'No arbitration output.'}
                   </p>
                 </div>
               )}
@@ -315,14 +321,14 @@ export function TaskStudioModal({ task, onClose, walletAddress, onUpdateTask, co
                 <div className="absolute top-0 left-0 w-1 h-full bg-cyber-blue"></div>
                 <h4 className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest mb-3 pl-2">Style Directives</h4>
                 <p className="text-xs text-white leading-relaxed font-mono bg-slate-950 p-4 rounded-xl border border-black shadow-inner">
-                  {task.guidelines}
+                  {task.guidelines || '(No guidelines provided)'}
                 </p>
               </div>
               <div className="bg-black/40 p-5 rounded-2xl border border-white/5 relative overflow-hidden group">
                 <div className="absolute top-0 left-0 w-1 h-full bg-cyber-pink"></div>
                 <h4 className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest mb-3 pl-2">Blacklist Words</h4>
                 <p className="text-xs text-cyber-pink leading-relaxed font-mono bg-slate-950 p-4 rounded-xl border border-black shadow-inner">
-                  {task.blacklist_words}
+                  {task.blacklist_words || '(None)'}
                 </p>
               </div>
             </div>
@@ -332,13 +338,13 @@ export function TaskStudioModal({ task, onClose, walletAddress, onUpdateTask, co
           <div className="bg-black/60 p-5 rounded-2xl border border-white/10 cyber-border">
             <div className="flex items-center justify-between mb-4">
               <span className="text-[10px] font-mono font-bold text-white uppercase tracking-widest flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span> Action Terminal [{walletAddress ? walletAddress.slice(0, 6) : 'DISCONNECTED'}]
+                <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span> Action Terminal [{safeAddr(walletAddress, 6)}]
               </span>
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
               {task.status === 'OPEN' && (
-                walletAddress?.toLowerCase() === task.publisher?.toLowerCase() ? (
+                isPublisher ? (
                   <div className="px-4 py-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-mono">
                     ⚡ You created this bounty (Publisher). Awaiting a Translator to lock {minStake} GEN stake & accept.
                   </div>
@@ -358,11 +364,11 @@ export function TaskStudioModal({ task, onClose, walletAddress, onUpdateTask, co
                   </button>
                 ) : isPublisher ? (
                   <div className="px-4 py-3 rounded-xl bg-cyber-blue/10 border border-cyber-blue/30 text-cyber-blue text-xs font-mono">
-                    ⌛ Translation in Progress. Assigned Translator ({task.translator.slice(0, 8)}...) is working on the subtitles.
+                    ⌛ Translation in Progress. Assigned Translator ({safeAddr(task.translator, 8)}) is working on the subtitles.
                   </div>
                 ) : (
                   <div className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-slate-400 text-xs font-mono">
-                    🔒 Task Assigned. Assigned Translator: {task.translator.slice(0, 8)}...
+                    🔒 Task Assigned. Assigned Translator: {safeAddr(task.translator, 8)}
                   </div>
                 )
               )}
@@ -388,27 +394,24 @@ export function TaskStudioModal({ task, onClose, walletAddress, onUpdateTask, co
                   <button onClick={() => handleResolveEscalation('RELEASE')} disabled={isProcessing} className="px-4 py-2 rounded-lg bg-cyber-green/20 text-cyber-green hover:bg-cyber-green text-[10px] hover:text-black font-mono font-bold uppercase transition-colors border border-cyber-green/30">
                     Release to Translator
                   </button>
-                  {(task.status === 'ESCALATED' || task.status === 'DISPUTED') && (
-                    <>
-                      <button onClick={() => handleResolveEscalation('REFUND')} disabled={isProcessing} className="px-4 py-2 rounded-lg bg-cyber-pink/20 text-cyber-pink hover:bg-cyber-pink text-[10px] hover:text-black font-mono font-bold uppercase transition-colors border border-cyber-pink/30">
-                        Refund to Pub
-                      </button>
-                      <button onClick={() => handleResolveEscalation('SPLIT')} disabled={isProcessing} className="px-4 py-2 rounded-lg bg-cyber-purple/20 text-cyber-purple hover:bg-cyber-purple text-[10px] hover:text-white font-mono font-bold uppercase transition-colors border border-cyber-purple/30">
-                        Split 50/50
-                      </button>
-                    </>
-                  )}
+                  <button onClick={() => handleResolveEscalation('REFUND')} disabled={isProcessing} className="px-4 py-2 rounded-lg bg-cyber-pink/20 text-cyber-pink hover:bg-cyber-pink text-[10px] hover:text-black font-mono font-bold uppercase transition-colors border border-cyber-pink/30">
+                    Refund to Pub
+                  </button>
+                  <button onClick={() => handleResolveEscalation('SPLIT')} disabled={isProcessing} className="px-4 py-2 rounded-lg bg-cyber-purple/20 text-cyber-purple hover:bg-cyber-purple text-[10px] hover:text-white font-mono font-bold uppercase transition-colors border border-cyber-purple/30">
+                    Split 50/50
+                  </button>
                 </div>
               )}
 
               {task.status === 'CLOSED' && (
                 <div className="text-[10px] font-mono text-slate-400 flex items-center gap-2 uppercase tracking-widest">
                   <Check className="w-4 h-4 text-cyber-green" />
-                  <span>Vault successfully settled on GenLayer.</span>
+                  <span>Task Settled & Funds Disbursed</span>
                 </div>
               )}
             </div>
           </div>
+
         </div>
       </div>
     </div>
