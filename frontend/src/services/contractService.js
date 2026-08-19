@@ -1,9 +1,36 @@
 import { createClient } from 'genlayer-js';
 import { studionet } from 'genlayer-js/chains';
+import { parseEther, formatEther } from 'viem';
 
 const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS || '0xd96a39B15b2bb4E65BF09bf27A53165fEA637114';
 
 export const CHAIN_ID_HEX = '0x' + studionet.id.toString(16);
+
+export function parseGenAmount(amountStr) {
+  try {
+    if (typeof amountStr === 'bigint') return amountStr;
+    const cleanStr = String(amountStr).trim();
+    if (!cleanStr || cleanStr === '0') return 0n;
+    return parseEther(cleanStr);
+  } catch (err) {
+    console.warn('parseGenAmount fallback for:', amountStr);
+    return BigInt(amountStr);
+  }
+}
+
+export function formatGenAmount(amountInWei) {
+  try {
+    if (!amountInWei || amountInWei === '0') return '0';
+    const strVal = String(amountInWei);
+    if (strVal.length > 12) {
+      const formatted = formatEther(BigInt(strVal));
+      return Number(formatted).toLocaleString(undefined, { maximumFractionDigits: 4 });
+    }
+    return Number(strVal).toLocaleString();
+  } catch (err) {
+    return String(amountInWei);
+  }
+}
 
 export async function ensureGenLayerNetwork() {
   if (!window.ethereum) return;
@@ -69,8 +96,8 @@ class ContractService {
     await ensureGenLayerNetwork();
     const client = this.getClient(senderAddress);
     
-    // Convert input escrow amount to BigInt
-    const val = BigInt(escrowAmount);
+    // Parse 100 GEN -> 100000000000000000000 wei (18 decimals)
+    const val = parseGenAmount(escrowAmount);
 
     const hash = await client.writeContract({
       address: this.contractAddress,
@@ -86,7 +113,7 @@ class ContractService {
   async acceptTask(taskId, stakeAmount, senderAddress) {
     await ensureGenLayerNetwork();
     const client = this.getClient(senderAddress);
-    const val = BigInt(stakeAmount);
+    const val = parseGenAmount(stakeAmount);
 
     const hash = await client.writeContract({
       address: this.contractAddress,

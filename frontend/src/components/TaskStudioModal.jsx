@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { parseSubtitle } from '../utils/srtParser';
 import { ConsensusFeed } from './ConsensusFeed';
+import { formatGenAmount } from '../services/contractService';
 
 export function TaskStudioModal({ task, onClose, walletAddress, onUpdateTask, contractService }) {
   if (!task) return null;
@@ -20,7 +21,9 @@ export function TaskStudioModal({ task, onClose, walletAddress, onUpdateTask, co
   const [actionSuccess, setActionSuccess] = useState('');
 
   const parsedCues = parseSubtitle(subtitleInput || task.sample_subtitles);
-  const minStake = Math.floor(Number(task.escrow_amount) * 0.2);
+  const displayEscrow = formatGenAmount(task.escrow_amount);
+  const rawEscrowNum = Number(displayEscrow.replace(/,/g, '')) || 0;
+  const minStake = Math.floor(rawEscrowNum * 0.2);
 
   const getStatusBadge = (status) => {
     switch (status) {

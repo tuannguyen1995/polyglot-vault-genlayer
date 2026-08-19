@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Globe, ArrowRight, AlertCircle, Plus } from 'lucide-react';
+import { formatGenAmount } from '../services/contractService';
 
 export function BountyExplorer({ tasks = [], onSelectTask, onOpenCreateModal }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -69,7 +70,9 @@ export function BountyExplorer({ tasks = [], onSelectTask, onOpenCreateModal }) 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {filteredTasks.length > 0 ? (
           filteredTasks.map((task) => {
-            const minStake = Math.floor(Number(task.escrow_amount) * 0.2);
+            const displayEscrow = formatGenAmount(task.escrow_amount);
+            const rawEscrowNum = Number(displayEscrow.replace(/,/g, '')) || 0;
+            const minStake = Math.floor(rawEscrowNum * 0.2);
 
             return (
               <div
@@ -108,7 +111,7 @@ export function BountyExplorer({ tasks = [], onSelectTask, onOpenCreateModal }) 
                 <div className="pt-4 border-t border-white/5 flex items-center justify-between relative z-10">
                   <div>
                     <div className="flex items-baseline gap-1.5">
-                      <span className="text-2xl font-display font-bold text-white tracking-tight">{task.escrow_amount}</span>
+                      <span className="text-2xl font-display font-bold text-white tracking-tight">{displayEscrow}</span>
                       <span className="text-[10px] font-bold text-cyber-blue font-mono">GEN</span>
                     </div>
                     <span className="text-[10px] font-mono text-slate-500 block">Stake: {minStake} GEN</span>
