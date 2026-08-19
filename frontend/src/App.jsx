@@ -40,6 +40,38 @@ export default function App() {
 
   useEffect(() => {
     refreshTasks();
+
+    // Check if wallet was already connected
+    const checkConnection = async () => {
+      if (window.ethereum) {
+        try {
+          const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+          if (accounts.length > 0) {
+            setWalletAddress(accounts[0].toLowerCase());
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      }
+    };
+    checkConnection();
+
+    // Listen for account changes
+    if (window.ethereum) {
+      const handleAccountsChanged = (accounts) => {
+        if (accounts.length > 0) {
+          setWalletAddress(accounts[0].toLowerCase());
+        } else {
+          setWalletAddress(null);
+        }
+      };
+      window.ethereum.on('accountsChanged', handleAccountsChanged);
+      return () => {
+        if (window.ethereum.removeListener) {
+          window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
+        }
+      };
+    }
   }, []);
 
   const handleCreateTask = async (taskData) => {
