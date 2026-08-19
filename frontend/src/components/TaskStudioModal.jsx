@@ -107,27 +107,39 @@ export function TaskStudioModal({ task, onClose, walletAddress, onUpdateTask, co
     finally { setIsProcessing(false); }
   };
 
+  const isPublisher = Boolean(walletAddress && task.publisher && walletAddress.toLowerCase() === task.publisher.toLowerCase());
+  const isAssignedTranslator = Boolean(walletAddress && task.translator && task.translator !== '0x0000000000000000000000000000000000000000' && walletAddress.toLowerCase() === task.translator.toLowerCase());
+  const isThirdParty = !isPublisher && !isAssignedTranslator;
+
+  const roleLabel = isPublisher 
+    ? 'PUBLISHER (CREATOR)' 
+    : isAssignedTranslator 
+      ? 'ASSIGNED TRANSLATOR' 
+      : 'TRANSLATOR / VISITOR';
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 bg-slate-950/90 backdrop-blur-xl overflow-y-auto">
-      <div className="bg-slate-950 border border-white/10 rounded-[2rem] w-full max-w-6xl shadow-2xl overflow-hidden flex flex-col max-h-[96vh] relative">
+      <div className="glass-panel w-full max-w-6xl rounded-3xl border border-white/10 cyber-border overflow-hidden my-auto max-h-[92vh] flex flex-col shadow-[0_0_50px_rgba(0,0,0,0.8)] relative">
         
-        {/* Glow Effects */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-32 bg-cyber-blue/10 blur-[100px] pointer-events-none"></div>
-
-        {/* Header HUD */}
-        <div className="p-5 sm:p-6 border-b border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between bg-black/40 relative z-10 gap-4">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-2xl bg-cyber-blue/10 border border-cyber-blue/30 text-cyber-blue shadow-[0_0_15px_rgba(0,240,255,0.2)]">
-              <Scan className="w-6 h-6" />
+        {/* Header */}
+        <div className="p-6 border-b border-white/5 flex items-center justify-between bg-black/40">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-cyber-purple/10 border border-cyber-purple/30 flex items-center justify-center">
+              <Scan className="w-5 h-5 text-cyber-purple" />
             </div>
             <div>
-              <div className="flex items-center gap-3 flex-wrap">
-                <span className="font-mono text-sm text-white font-bold tracking-wider">{task.id}</span>
+              <div className="flex items-center gap-2">
+                <h3 className="font-mono font-bold text-lg text-white">{task.id}</h3>
                 {getStatusBadge(task.status)}
+                <span className={`px-2.5 py-0.5 rounded text-[10px] font-mono font-bold border ${
+                  isPublisher ? 'bg-cyber-blue/10 text-cyber-blue border-cyber-blue/30' :
+                  isAssignedTranslator ? 'bg-cyber-green/10 text-cyber-green border-cyber-green/30' :
+                  'bg-white/5 text-slate-400 border-white/10'
+                }`}>
+                  ROLE: {roleLabel}
+                </span>
               </div>
-              <p className="text-xs font-mono text-slate-400 mt-1 uppercase tracking-widest">
-                Target: <span className="text-cyber-blue">{task.target_lang}</span>
-              </p>
+              <p className="text-xs text-slate-400 font-mono">TARGET: <span className="text-white font-bold">{task.target_lang}</span></p>
             </div>
           </div>
 
@@ -137,52 +149,58 @@ export function TaskStudioModal({ task, onClose, walletAddress, onUpdateTask, co
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center px-6 border-b border-white/5 bg-black/60 text-[11px] font-mono uppercase tracking-widest gap-2 overflow-x-auto hide-scrollbar relative z-10">
+        <div className="flex items-center gap-2 px-6 pt-4 border-b border-white/5 bg-black/20 font-mono text-xs">
           <button
             onClick={() => setActiveTab('studio')}
-            className={`py-4 px-4 border-b-2 transition-all whitespace-nowrap ${
-              activeTab === 'studio' ? 'border-cyber-blue text-white font-bold shadow-[0_10px_20px_-10px_rgba(0,240,255,0.3)]' : 'border-transparent text-slate-500 hover:text-slate-300'
+            className={`px-4 py-2.5 rounded-t-xl transition-colors flex items-center gap-2 border-t border-x ${
+              activeTab === 'studio'
+                ? 'bg-slate-900 text-white border-white/10 font-bold'
+                : 'text-slate-400 hover:text-white border-transparent'
             }`}
           >
-            HUD: Live Studio
+            <FileText className="w-3.5 h-3.5 text-cyber-blue" />
+            <span>HUD: Live Studio</span>
           </button>
           <button
             onClick={() => setActiveTab('consensus')}
-            className={`py-4 px-4 border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
-              activeTab === 'consensus' ? 'border-cyber-purple text-white font-bold shadow-[0_10px_20px_-10px_rgba(176,38,255,0.3)]' : 'border-transparent text-slate-500 hover:text-slate-300'
+            className={`px-4 py-2.5 rounded-t-xl transition-colors flex items-center gap-2 border-t border-x ${
+              activeTab === 'consensus'
+                ? 'bg-slate-900 text-white border-white/10 font-bold'
+                : 'text-slate-400 hover:text-white border-transparent'
             }`}
           >
-            <Cpu className="w-3.5 h-3.5" />
-            GenVM Consensus
+            <Cpu className="w-3.5 h-3.5 text-cyber-purple" />
+            <span>GenVM Consensus</span>
           </button>
           <button
             onClick={() => setActiveTab('guidelines')}
-            className={`py-4 px-4 border-b-2 transition-all whitespace-nowrap ${
-              activeTab === 'guidelines' ? 'border-cyber-pink text-white font-bold shadow-[0_10px_20px_-10px_rgba(255,0,85,0.3)]' : 'border-transparent text-slate-500 hover:text-slate-300'
+            className={`px-4 py-2.5 rounded-t-xl transition-colors flex items-center gap-2 border-t border-x ${
+              activeTab === 'guidelines'
+                ? 'bg-slate-900 text-white border-white/10 font-bold'
+                : 'text-slate-400 hover:text-white border-transparent'
             }`}
           >
-            Directives
+            <Shield className="w-3.5 h-3.5 text-cyber-pink" />
+            <span>Directives</span>
           </button>
         </div>
 
-        {/* Alerts Banner */}
-        <div className="px-6 pt-4 empty:hidden relative z-10">
+        {/* Modal Body */}
+        <div className="p-6 overflow-y-auto flex-1 space-y-6">
           {actionError && (
-            <div className="p-3 rounded-xl bg-cyber-pink/10 border border-cyber-pink/30 text-cyber-pink text-xs flex items-center gap-2 font-mono">
-              <AlertCircle className="w-4 h-4 flex-shrink-0" /><span>{actionError}</span>
+            <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-mono flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              <span>{actionError}</span>
             </div>
           )}
           {actionSuccess && (
-            <div className="p-3 rounded-xl bg-cyber-green/10 border border-cyber-green/30 text-cyber-green text-xs flex items-center gap-2 font-mono">
-              <CheckCircle2 className="w-4 h-4 flex-shrink-0" /><span>{actionSuccess}</span>
+            <div className="p-4 rounded-xl bg-cyber-green/10 border border-cyber-green/30 text-cyber-green text-xs font-mono flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+              <span>{actionSuccess}</span>
             </div>
           )}
-        </div>
 
-        {/* Modal Body */}
-        <div className="p-6 overflow-y-auto flex-1 space-y-6 relative z-10">
-          
-          {/* TAB 1: DUAL-PANE LIVE STUDIO */}
+          {/* TAB 1: STUDIO */}
           {activeTab === 'studio' && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               
@@ -219,7 +237,7 @@ export function TaskStudioModal({ task, onClose, walletAddress, onUpdateTask, co
                   </span>
                 </div>
 
-                {task.status === 'IN_PROGRESS' || task.status === 'NEEDS_REVISION' ? (
+                {isAssignedTranslator && (task.status === 'IN_PROGRESS' || task.status === 'NEEDS_REVISION') ? (
                   <div className="flex-1 flex flex-col gap-3 overflow-hidden">
                     <textarea
                       value={subtitleInput}
@@ -248,7 +266,11 @@ export function TaskStudioModal({ task, onClose, walletAddress, onUpdateTask, co
                         </div>
                       ))
                     ) : (
-                      <p className="text-slate-600 text-center py-12">NO TELEMETRY DETECTED</p>
+                      <div className="text-slate-500 text-center py-16 font-mono text-xs space-y-2">
+                        <p className="font-bold text-slate-400">NO DELIVERABLE SUBMITTED YET</p>
+                        {task.status === 'OPEN' && <p>Awaiting a Translator to lock {minStake} GEN stake and accept.</p>}
+                        {task.status === 'IN_PROGRESS' && <p>Assigned Translator ({task.translator.slice(0,8)}...) is working on the subtitles.</p>}
+                      </div>
                     )}
                   </div>
                 )}
@@ -329,25 +351,34 @@ export function TaskStudioModal({ task, onClose, walletAddress, onUpdateTask, co
               )}
 
               {(task.status === 'IN_PROGRESS' || task.status === 'NEEDS_REVISION') && (
-                <button onClick={handleSubmitSubtitles} disabled={isProcessing} className="px-5 py-3 rounded-xl bg-cyber-purple text-white hover:bg-cyber-purple/90 disabled:opacity-50 text-xs font-display font-bold transition flex items-center gap-2 shadow-[0_0_15px_rgba(176,38,255,0.3)]">
-                  <Send className="w-4 h-4" />
-                  <span>Submit Payload & Run Consensus</span>
-                </button>
+                isAssignedTranslator ? (
+                  <button onClick={handleSubmitSubtitles} disabled={isProcessing} className="px-5 py-3 rounded-xl bg-cyber-purple text-white hover:bg-cyber-purple/90 disabled:opacity-50 text-xs font-display font-bold transition flex items-center gap-2 shadow-[0_0_15px_rgba(176,38,255,0.3)]">
+                    <Send className="w-4 h-4" />
+                    <span>Submit Payload & Run Consensus</span>
+                  </button>
+                ) : isPublisher ? (
+                  <div className="px-4 py-3 rounded-xl bg-cyber-blue/10 border border-cyber-blue/30 text-cyber-blue text-xs font-mono">
+                    ⌛ Translation in Progress. Assigned Translator ({task.translator.slice(0, 8)}...) is working on the subtitles.
+                  </div>
+                ) : (
+                  <div className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-slate-400 text-xs font-mono">
+                    🔒 Task Assigned. Assigned Translator: {task.translator.slice(0, 8)}...
+                  </div>
+                )
               )}
 
               {task.status === 'AWAITING_PAYOUT' && (
                 <div className="flex flex-wrap items-center gap-3 w-full">
                   <div className="flex items-center gap-2 text-[10px] font-mono text-amber-400 bg-amber-500/10 px-4 py-3 rounded-xl border border-amber-500/30 uppercase tracking-widest flex-1">
                     <Clock className="w-4 h-4" />
-                    <span>Cooling-off window active</span>
+                    <span>Cooling-off window active (24h)</span>
                   </div>
-                  <button onClick={() => handleFinalizePayout(false)} disabled={isProcessing} className="px-5 py-3 rounded-xl bg-cyber-blue text-black hover:bg-white disabled:opacity-50 text-xs font-display font-bold transition flex items-center gap-2 shadow-[0_0_15px_rgba(0,240,255,0.3)]">
-                    <DollarSign className="w-4 h-4" />
-                    <span>Finalize Vault</span>
-                  </button>
-                  <button onClick={() => handleFinalizePayout(true)} disabled={isProcessing} className="px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white text-[10px] font-mono font-bold transition uppercase border border-white/10">
-                    Bypass Time (Demo)
-                  </button>
+                  {(isPublisher || isAssignedTranslator) && (
+                    <button onClick={handleFinalizePayout} disabled={isProcessing} className="px-5 py-3 rounded-xl bg-cyber-blue text-black hover:bg-white disabled:opacity-50 text-xs font-display font-bold transition flex items-center gap-2 shadow-[0_0_15px_rgba(0,240,255,0.3)]">
+                      <DollarSign className="w-4 h-4" />
+                      <span>Finalize Vault</span>
+                    </button>
+                  )}
                 </div>
               )}
 
