@@ -331,6 +331,16 @@ export function TaskStudioModal({ task, onClose, walletAddress, onUpdateTask, co
                   {task.blacklist_words || '(None)'}
                 </p>
               </div>
+
+              {task.custom_quiz_criteria && (
+                <div className="bg-black/40 p-5 rounded-2xl border border-white/5 relative overflow-hidden group">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-cyber-purple"></div>
+                  <h4 className="text-[10px] font-mono font-bold text-cyber-purple uppercase tracking-widest mb-3 pl-2">🎬 Specialized Film Criteria & Quiz</h4>
+                  <p className="text-xs text-white leading-relaxed font-mono bg-slate-950 p-4 rounded-xl border border-black shadow-inner whitespace-pre-wrap">
+                    {task.custom_quiz_criteria}
+                  </p>
+                </div>
+              )}
             </div>
           )}
 

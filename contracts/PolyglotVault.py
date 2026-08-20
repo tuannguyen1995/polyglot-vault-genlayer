@@ -1,4 +1,4 @@
-# v0.2.17
+# v0.2.18
 # { "Depends": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6" }
 from genlayer import *
 from dataclasses import dataclass
@@ -25,6 +25,7 @@ class Task:
     disputed_at: bigint
     deadline_duration: bigint
     deadline: bigint
+    custom_quiz_criteria: str
 
 class Contract(gl.Contract):
     platform_admin: str
@@ -51,7 +52,7 @@ class Contract(gl.Contract):
                 return {"verdict": "ESCALATE", "confidence": 0, "reason": "Failed to parse AI output."}
 
     @gl.public.write.payable
-    def create_task(self, task_id: str, media_url: str, target_lang: str, guidelines: str, blacklist_words: str, deadline_hours: bigint = bigint(48)) -> None:
+    def create_task(self, task_id: str, media_url: str, target_lang: str, guidelines: str, blacklist_words: str, deadline_hours: bigint = bigint(48), custom_quiz_criteria: str = "") -> None:
         if task_id in self.tasks:
             raise UserError(f"Task ID {task_id} already exists")
         
@@ -80,7 +81,8 @@ class Contract(gl.Contract):
             payout_ready_at=bigint(0),
             disputed_at=bigint(0),
             deadline_duration=dur,
-            deadline=bigint(0)
+            deadline=bigint(0),
+            custom_quiz_criteria=custom_quiz_criteria
         )
         self.tasks[task_id] = task
         self.task_ids.append(task_id)
@@ -151,6 +153,7 @@ class Contract(gl.Contract):
         lang_str = task.target_lang
         guide_str = task.guidelines
         black_str = task.blacklist_words
+        quiz_str = task.custom_quiz_criteria
 
         def leader_fn() -> dict:
             try:
@@ -169,7 +172,7 @@ class Contract(gl.Contract):
 
             prompt = f"""
 You are a Senior Localization Adjudicator & Polyglot Quality Judge on GenLayer.
-Evaluate the submitted subtitle file against the original media context.
+Evaluate the submitted subtitle file against the original media context and custom cinematic quiz criteria.
 
 ORIGINAL MEDIA CONTENT / TRANSCRIPT:
 {m_text[:2500]}
@@ -183,17 +186,20 @@ STYLE & CULTURAL GUIDELINES:
 FORBIDDEN / BLACKLISTED WORDS:
 {black_str}
 
+SPECIALIZED CINEMATIC QUIZ & CRITERIA (CHECK EACH POINT):
+{quiz_str if quiz_str else "None specified."}
+
 SUBMITTED SUBTITLE DELIVERABLE (SRT/VTT/TEXT):
 {s_text[:2500]}
 
 DECISION CRITERIA:
-- APPROVED: Accurate timing, high translation fidelity, cultural nuance preserved, zero blacklist words.
+- APPROVED: Accurate timing, high translation fidelity, cultural nuance preserved, zero blacklist words, passes all specialized quiz criteria.
 - PARTIAL: Minor typos or slightly awkward phrasing, but fully legible and usable.
-- REFUND: Machine-translation hallucinations, wrong language, severe timing drift, or used blacklist terms.
+- REFUND: Machine-translation hallucinations, wrong language, severe timing drift, used blacklist terms, or failed specialized quiz criteria.
 - ESCALATE: Evidence is unreadable, ambiguous, or requires human linguistic arbitration.
 
 Respond ONLY with valid JSON:
-{{"verdict": "APPROVED|PARTIAL|REFUND|ESCALATE", "confidence": 0-100, "reason": "Technical justification"}}
+{{"verdict": "APPROVED|PARTIAL|REFUND|ESCALATE", "confidence": 0-100, "reason": "Technical & Specialized Quiz evaluation details"}}
 """
             res = gl.nondet.exec_prompt(prompt, response_format="json")
             if isinstance(res, dict):
@@ -349,6 +355,7 @@ Respond ONLY with valid JSON:
                     "payout_ready_at": str(t.payout_ready_at),
                     "disputed_at": str(t.disputed_at),
                     "deadline_duration": str(t.deadline_duration),
-                    "deadline": str(t.deadline)
+                    "deadline": str(t.deadline),
+                    "custom_quiz_criteria": getattr(t, "custom_quiz_criteria", "")
                 })
         return json.dumps(res)

@@ -107,7 +107,7 @@ class ContractService {
     return checkFn();
   }
 
-  async createTask({ taskId, mediaUrl, targetLang, guidelines, blacklistWords, escrowAmount, senderAddress }) {
+  async createTask({ taskId, mediaUrl, targetLang, guidelines, blacklistWords, escrowAmount, senderAddress, customQuizCriteria = '' }) {
     await ensureGenLayerNetwork();
     const client = this.getClient(senderAddress);
     const val = parseGenAmount(escrowAmount);
@@ -115,7 +115,7 @@ class ContractService {
     const hash = await client.writeContract({
       address: this.contractAddress,
       functionName: 'create_task',
-      args: [taskId, mediaUrl, targetLang, guidelines, blacklistWords],
+      args: [taskId, mediaUrl, targetLang, guidelines, blacklistWords, 48, customQuizCriteria],
       value: val,
     });
 

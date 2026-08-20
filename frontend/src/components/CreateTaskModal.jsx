@@ -11,6 +11,9 @@ export function CreateTaskModal({ onClose, onCreateTask }) {
   const [sourceTranscript, setSourceTranscript] = useState(`[00:00:01] Welcome to our peaceful culinary kitchen.
 [00:00:06] Today we gently simmer fragrant star anise, cinnamon, and ginger.
 [00:00:14] Let the rich broth develop deep herbal clarity over low embers.`);
+  const [customQuizCriteria, setCustomQuizCriteria] = useState(
+    '1. Are character slang & cinematic tone preserved?\n2. Are technical/specialized terms translated accurately?\n3. Are line lengths kept under 42 characters per line?'
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -23,6 +26,7 @@ export function CreateTaskModal({ onClose, onCreateTask }) {
       setEscrowAmount('1200');
       setGuidelines('Whisper / ASMR tone. Accurate Vietnamese spice names (star anise, cardamom, grilled ginger). Avoid literal robotic phrasing.');
       setBlacklistWords('plastic, fake, junk, synthetic');
+      setCustomQuizCriteria('1. Are Vietnamese culinary spices correctly named (hồi, quế, gừng nướng)?\n2. Is the soothing ASMR whisper tone reflected in word choices?');
       setSourceTranscript(`[00:00:02] Welcome back to the culinary sanctuary.
 [00:00:08] Today we gently char fresh shallots and ginger over open embers.
 [00:00:15] Listen to the subtle sizzle as natural oils release their herbal sweetness.`);
@@ -33,6 +37,7 @@ export function CreateTaskModal({ onClose, onCreateTask }) {
       setEscrowAmount('2000');
       setGuidelines('Professional tech tone. Preserve key Web3 terminology: Intelligent Contracts, Subjective Consensus, Non-deterministic execution.');
       setBlacklistWords('pump, token dump, casino, moon');
+      setCustomQuizCriteria('1. Are Web3 terms preserved (Intelligent Contracts, Subjective Consensus)?\n2. Is the tone professional and authoritative?');
       setSourceTranscript(`[00:00:01] Introducing GenLayer, the first AI-powered blockchain.
 [00:00:08] Non-deterministic transactions allow validators to run LLMs natively.
 [00:00:15] Contracts can inspect internet web data without centralized oracles.`);
@@ -43,6 +48,7 @@ export function CreateTaskModal({ onClose, onCreateTask }) {
       setEscrowAmount('1500');
       setGuidelines('Cyberpunk sci-fi tone. Keep mech terminology consistent. Natural dramatic dialogue.');
       setBlacklistWords('google translate, broken machine, lorem ipsum');
+      setCustomQuizCriteria('1. Are sci-fi thruster & mech sync terms localized accurately?\n2. Is dramatic punch in character dialogue preserved?');
       setSourceTranscript(`[00:00:03] All thrusters to maximum output!
 [00:00:07] Target vector confirmed in sector 4. Sync rate at 94 percent!`);
     }
@@ -64,7 +70,8 @@ export function CreateTaskModal({ onClose, onCreateTask }) {
         escrowAmount: Number(escrowAmount),
         guidelines: guidelines.trim(),
         blacklistWords: blacklistWords.trim(),
-        sourceTranscript: sourceTranscript.trim()
+        sourceTranscript: sourceTranscript.trim(),
+        customQuizCriteria: customQuizCriteria.trim()
       });
       onClose();
     } catch (err) {
@@ -202,6 +209,20 @@ export function CreateTaskModal({ onClose, onCreateTask }) {
               onChange={(e) => setGuidelines(e.target.value)}
               placeholder="Tone, cultural nuances, target audience constraints..."
               className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-200 focus:outline-none focus:border-indigo-500 resize-none"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-cyber-purple mb-1 font-semibold flex items-center gap-1.5">
+              <span>🎬 SPECIALIZED FILM CRITERIA & QUIZ (OPTIONAL)</span>
+            </label>
+            <textarea
+              rows={3}
+              value={customQuizCriteria}
+              onChange={(e) => setCustomQuizCriteria(e.target.value)}
+              placeholder="1. Question/Criteria 1... 2. Question/Criteria 2... (GenVM AI Validator will grade each specific point on-chain)"
+              className="w-full bg-black/60 border border-cyber-purple/40 rounded-lg p-2.5 text-slate-200 focus:outline-none focus:border-cyber-purple font-mono text-xs"
             />
           </div>
 
