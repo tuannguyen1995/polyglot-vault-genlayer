@@ -175,6 +175,19 @@ class ContractService {
 
     return this.waitForTxOrState(hash, () => this.getTaskById(taskId));
   }
+
+  async slashExpiredTask(taskId, senderAddress) {
+    await ensureGenLayerNetwork();
+    const client = this.getClient(senderAddress);
+
+    const hash = await client.writeContract({
+      address: this.contractAddress,
+      functionName: 'slash_expired_task',
+      args: [taskId],
+    });
+
+    return this.waitForTxOrState(hash, () => this.getTaskById(taskId));
+  }
 }
 
 export const contractService = new ContractService();

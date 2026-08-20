@@ -1,4 +1,4 @@
-# v0.2.16
+# v0.2.17
 # { "Depends": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6" }
 from genlayer import *
 from dataclasses import dataclass
@@ -23,6 +23,8 @@ class Task:
     attempts: bigint
     payout_ready_at: bigint
     disputed_at: bigint
+    deadline_duration: bigint
+    deadline: bigint
 
 class Contract(gl.Contract):
     platform_admin: str
@@ -49,7 +51,7 @@ class Contract(gl.Contract):
                 return {"verdict": "ESCALATE", "confidence": 0, "reason": "Failed to parse AI output."}
 
     @gl.public.write.payable
-    def create_task(self, task_id: str, media_url: str, target_lang: str, guidelines: str, blacklist_words: str) -> None:
+    def create_task(self, task_id: str, media_url: str, target_lang: str, guidelines: str, blacklist_words: str, deadline_hours: bigint = bigint(48)) -> None:
         if task_id in self.tasks:
             raise UserError(f"Task ID {task_id} already exists")
         
@@ -58,6 +60,7 @@ class Contract(gl.Contract):
             raise UserError("Escrow bounty must be strictly positive")
 
         caller = str(gl.message.sender_address).lower()
+        dur = deadline_hours * bigint(3600) if deadline_hours > bigint(0) else bigint(172800)
         
         task = Task(
             publisher=caller,
@@ -75,7 +78,9 @@ class Contract(gl.Contract):
             confidence=bigint(0),
             attempts=bigint(0),
             payout_ready_at=bigint(0),
-            disputed_at=bigint(0)
+            disputed_at=bigint(0),
+            deadline_duration=dur,
+            deadline=bigint(0)
         )
         self.tasks[task_id] = task
         self.task_ids.append(task_id)
@@ -99,6 +104,31 @@ class Contract(gl.Contract):
         task.translator = caller
         task.translator_stake = gl.message.value
         task.status = "IN_PROGRESS"
+        task.deadline = self._get_current_timestamp() + task.deadline_duration
+        self.tasks[task_id] = task
+
+    @gl.public.write
+    def slash_expired_task(self, task_id: str) -> None:
+        if task_id not in self.tasks:
+            raise UserError("Task not found")
+        task = self.tasks[task_id]
+        if task.status != "IN_PROGRESS":
+            raise UserError("Task is not in progress")
+
+        caller = str(gl.message.sender_address).lower()
+        if caller != task.publisher and caller != self.platform_admin:
+            raise UserError("Only publisher or platform admin can slash an expired task")
+
+        now = self._get_current_timestamp()
+        if now <= task.deadline:
+            raise UserError("Deadline has not expired yet")
+
+        total_slash = task.escrow_amount + task.translator_stake
+        task.status = "CLOSED"
+        task.escrow_amount = bigint(0)
+        task.translator_stake = bigint(0)
+
+        gl.get_contract_at(Address(task.publisher)).emit_transfer(value=u256(total_slash))
         self.tasks[task_id] = task
 
     @gl.public.write
@@ -317,6 +347,8 @@ Respond ONLY with valid JSON:
                     "confidence": str(t.confidence),
                     "attempts": str(t.attempts),
                     "payout_ready_at": str(t.payout_ready_at),
-                    "disputed_at": str(t.disputed_at)
+                    "disputed_at": str(t.disputed_at),
+                    "deadline_duration": str(t.deadline_duration),
+                    "deadline": str(t.deadline)
                 })
         return json.dumps(res)

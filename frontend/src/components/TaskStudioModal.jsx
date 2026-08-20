@@ -363,8 +363,15 @@ export function TaskStudioModal({ task, onClose, walletAddress, onUpdateTask, co
                     <span>Submit Payload & Run Consensus</span>
                   </button>
                 ) : isPublisher ? (
-                  <div className="px-4 py-3 rounded-xl bg-cyber-blue/10 border border-cyber-blue/30 text-cyber-blue text-xs font-mono">
-                    ⌛ Translation in Progress. Assigned Translator ({safeAddr(task.translator, 8)}) is working on the subtitles.
+                  <div className="flex items-center gap-3 w-full">
+                    <div className="px-4 py-3 rounded-xl bg-cyber-blue/10 border border-cyber-blue/30 text-cyber-blue text-xs font-mono flex-1">
+                      ⌛ Translation in Progress. Assigned Translator ({safeAddr(task.translator, 8)}) is working on the subtitles.
+                    </div>
+                    {isDeadlineExpired && (
+                      <button onClick={handleSlashExpiredTask} disabled={isProcessing} className="px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-mono hover:bg-red-500 hover:text-white transition-colors">
+                        Slash & Refund
+                      </button>
+                    )}
                   </div>
                 ) : (
                   <div className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-slate-400 text-xs font-mono">
