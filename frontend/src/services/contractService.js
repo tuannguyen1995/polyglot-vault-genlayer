@@ -2,7 +2,7 @@ import { createClient } from 'genlayer-js';
 import { studionet } from 'genlayer-js/chains';
 import { parseEther, formatEther } from 'viem';
 
-const CONTRACT_ADDRESS = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_CONTRACT_ADDRESS) || '0xd96a39B15b2bb4E65BF09bf27A53165fEA637114';
+const CONTRACT_ADDRESS = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_CONTRACT_ADDRESS) || '0xB672998Ba843ce96Dd4a6D0804E4935b6B77A69F';
 
 export const CHAIN_ID_HEX = '0x' + studionet.id.toString(16);
 
