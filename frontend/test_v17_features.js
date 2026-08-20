@@ -2,7 +2,7 @@ import { createClient, generatePrivateKey, createAccount } from 'genlayer-js';
 import { studionet } from 'genlayer-js/chains';
 import { parseEther } from 'viem';
 
-const CONTRACT_ADDRESS = '0xB672998Ba843ce96Dd4a6D0804E4935b6B77A69F';
+const CONTRACT_ADDRESS = '0xd6620b7844BF16B39631a1bb286c8B38232FC850';
 const mainClient = createClient({ chain: studionet });
 
 async function getTask(id) {
@@ -43,7 +43,9 @@ async function runAudit() {
       'https://cdn.polyglotvault.io/transcripts/cooking_video_01.txt',
       'English to Vietnamese',
       'Maintain soothing culinary tone',
-      'junk, plastic, fake'
+      'junk, plastic, fake',
+      48,
+      '1. Are Vietnamese culinary spices correctly named (hồi, quế, gừng nướng)?\n2. Is the soothing ASMR whisper tone reflected in word choices?'
     ],
     value: parseEther('10'),
   });
