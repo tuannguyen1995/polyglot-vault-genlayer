@@ -188,6 +188,19 @@ class ContractService {
 
     return this.waitForTxOrState(hash, () => this.getTaskById(taskId));
   }
+
+  async raiseDispute(taskId, reason = '', senderAddress) {
+    await ensureGenLayerNetwork();
+    const client = this.getClient(senderAddress);
+
+    const hash = await client.writeContract({
+      address: this.contractAddress,
+      functionName: 'raise_dispute',
+      args: [taskId, reason],
+    });
+
+    return this.waitForTxOrState(hash, () => this.getTaskById(taskId));
+  }
 }
 
 export const contractService = new ContractService();

@@ -100,6 +100,37 @@ export function TaskStudioModal({ task, onClose, walletAddress, onUpdateTask, co
     finally { setIsProcessing(false); }
   };
 
+  const handleSlashExpiredTask = async () => {
+    try {
+      setIsProcessing(true);
+      setActionError('');
+      setActionSuccess('');
+      const updated = await contractService.slashExpiredTask(task.id, walletAddress);
+      if (onUpdateTask) onUpdateTask(updated);
+      setActionSuccess('Task slashed successfully! Escrow and Translator Stake refunded to Publisher.');
+    } catch (err) {
+      setActionError(err.message || 'Failed to slash expired task.');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleRaiseDispute = async () => {
+    try {
+      setIsProcessing(true);
+      setActionError('');
+      setActionSuccess('');
+      const reason = prompt('Enter dispute reason (optional):') || 'Dispute raised by user during 24h window';
+      const updated = await contractService.raiseDispute(task.id, reason, walletAddress);
+      if (onUpdateTask) onUpdateTask(updated);
+      setActionSuccess('Dispute raised successfully! Task transitioned to DISPUTED status. Payout blocked and sent to Arbitration.');
+    } catch (err) {
+      setActionError(err.message || 'Failed to raise dispute.');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   const handleResolveEscalation = async (action) => {
     setActionError(''); setActionSuccess('');
     if (!walletAddress) return setActionError('Please connect your Web3 wallet first.');
@@ -394,26 +425,32 @@ export function TaskStudioModal({ task, onClose, walletAddress, onUpdateTask, co
                 <div className="flex flex-wrap items-center gap-3 w-full">
                   <div className="flex items-center gap-2 text-[10px] font-mono text-amber-400 bg-amber-500/10 px-4 py-3 rounded-xl border border-amber-500/30 uppercase tracking-widest flex-1">
                     <Clock className="w-4 h-4" />
-                    <span>Cooling-off window active (24h)</span>
+                    <span>Cooling-off window active (24h dispute window open)</span>
                   </div>
                   {(isPublisher || isAssignedTranslator) && (
-                    <button onClick={handleFinalizePayout} disabled={isProcessing} className="px-5 py-3 rounded-xl bg-cyber-blue text-black hover:bg-white disabled:opacity-50 text-xs font-display font-bold transition flex items-center gap-2 shadow-[0_0_15px_rgba(0,240,255,0.3)]">
-                      <DollarSign className="w-4 h-4" />
-                      <span>Finalize Vault</span>
-                    </button>
+                    <>
+                      <button onClick={handleRaiseDispute} disabled={isProcessing} className="px-4 py-3 rounded-xl bg-cyber-pink/20 text-cyber-pink hover:bg-cyber-pink hover:text-black border border-cyber-pink/40 text-xs font-mono font-bold transition flex items-center gap-2">
+                        <AlertCircle className="w-4 h-4" />
+                        <span>Raise Dispute</span>
+                      </button>
+                      <button onClick={handleFinalizePayout} disabled={isProcessing} className="px-5 py-3 rounded-xl bg-cyber-blue text-black hover:bg-white disabled:opacity-50 text-xs font-display font-bold transition flex items-center gap-2 shadow-[0_0_15px_rgba(0,240,255,0.3)]">
+                        <DollarSign className="w-4 h-4" />
+                        <span>Finalize Vault</span>
+                      </button>
+                    </>
                   )}
                 </div>
               )}
 
-              {task.status === 'ESCALATED' && (
+              {(task.status === 'ESCALATED' || task.status === 'DISPUTED') && (
                 isPublisher ? (
                   <div className="flex flex-wrap items-center gap-3 w-full p-4 rounded-xl bg-cyber-pink/5 border border-cyber-pink/20">
-                    <span className="text-[10px] text-cyber-pink font-mono uppercase tracking-widest font-bold">Publisher Voluntary Action:</span>
+                    <span className="text-[10px] text-cyber-pink font-mono uppercase tracking-widest font-bold">Publisher Action (Disputed / Escalated):</span>
                     <button onClick={() => handleResolveEscalation('RELEASE')} disabled={isProcessing} className="px-4 py-2 rounded-lg bg-cyber-green/20 text-cyber-green hover:bg-cyber-green text-[10px] hover:text-black font-mono font-bold uppercase transition-colors border border-cyber-green/30">
                       Release Escrow to Translator
                     </button>
                     <span className="text-[10px] font-mono text-slate-500 block w-full">
-                      (Voluntarily release funds to Translator. REFUND or SPLIT requires Platform Admin resolution)
+                      (Finalization blocked. Voluntarily release funds to Translator, or wait for Platform Admin REFUND/SPLIT arbitration)
                     </span>
                   </div>
                 ) : (

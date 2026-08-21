@@ -1,4 +1,4 @@
-# v0.2.18
+# v0.2.19
 # { "Depends": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6" }
 from genlayer import *
 from dataclasses import dataclass
@@ -258,6 +258,28 @@ Respond ONLY with valid JSON:
         else:
             task.status = "ESCALATED"
 
+        self.tasks[task_id] = task
+
+    @gl.public.write
+    def raise_dispute(self, task_id: str, reason: str = "") -> None:
+        if task_id not in self.tasks:
+            raise UserError("Task not found")
+        task = self.tasks[task_id]
+        if task.status != "AWAITING_PAYOUT":
+            raise UserError("Task is not in AWAITING_PAYOUT status")
+
+        caller = str(gl.message.sender_address).lower()
+        if caller != task.publisher and caller != task.translator:
+            raise UserError("Only publisher or assigned translator can raise a dispute")
+
+        now = self._get_current_timestamp()
+        if now > task.payout_ready_at:
+            raise UserError("24-hour dispute window has elapsed")
+
+        task.status = "DISPUTED"
+        task.disputed_at = now
+        if reason:
+            task.reason = f"[DISPUTED by {caller[:8]}] {reason}"
         self.tasks[task_id] = task
 
     @gl.public.write
