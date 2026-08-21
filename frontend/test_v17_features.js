@@ -2,7 +2,7 @@ import { createClient, generatePrivateKey, createAccount } from 'genlayer-js';
 import { studionet } from 'genlayer-js/chains';
 import { parseEther } from 'viem';
 
-const CONTRACT_ADDRESS = '0xd6620b7844BF16B39631a1bb286c8B38232FC850';
+const CONTRACT_ADDRESS = '0x07509a821D981379Ba57e10551AF2FDc3cb7ee7f';
 const mainClient = createClient({ chain: studionet });
 
 async function getTask(id) {

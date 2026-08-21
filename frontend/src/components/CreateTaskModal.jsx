@@ -26,7 +26,7 @@ export function CreateTaskModal({ onClose, onCreateTask }) {
       setEscrowAmount('1200');
       setGuidelines('Whisper / ASMR tone. Accurate Vietnamese spice names (star anise, cardamom, grilled ginger). Avoid literal robotic phrasing.');
       setBlacklistWords('plastic, fake, junk, synthetic');
-      setCustomQuizCriteria('1. Are Vietnamese culinary spices correctly named (hồi, quế, gừng nướng)?\n2. Is the soothing ASMR whisper tone reflected in word choices?');
+      setCustomQuizCriteria('1. Are Vietnamese culinary spices correctly named (star anise, cinnamon, charred ginger)?\n2. Is the soothing ASMR whisper tone reflected in word choices?');
       setSourceTranscript(`[00:00:02] Welcome back to the culinary sanctuary.
 [00:00:08] Today we gently char fresh shallots and ginger over open embers.
 [00:00:15] Listen to the subtle sizzle as natural oils release their herbal sweetness.`);

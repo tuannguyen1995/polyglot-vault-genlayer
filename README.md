@@ -12,8 +12,8 @@
 ## 🔗 Live Deployments & Links
 
 - **Live Production dApp**: [https://polyglot-vault-genlayer.vercel.app](https://polyglot-vault-genlayer.vercel.app)
-- **Deployed Intelligent Contract (Studionet)**: [`0xd96a39B15b2bb4E65BF09bf27A53165fEA637114`](https://genlayer-explorer.vercel.app/address/0xd96a39B15b2bb4E65BF09bf27A53165fEA637114)
-- **GenLayer Explorer Link**: [https://genlayer-explorer.vercel.app/address/0xd96a39B15b2bb4E65BF09bf27A53165fEA637114](https://genlayer-explorer.vercel.app/address/0xd96a39B15b2bb4E65BF09bf27A53165fEA637114)
+- **Deployed Intelligent Contract (Studionet)**: [`0x07509a821D981379Ba57e10551AF2FDc3cb7ee7f`](https://genlayer-explorer.vercel.app/address/0x07509a821D981379Ba57e10551AF2FDc3cb7ee7f)
+- **GenLayer Explorer Link**: [https://genlayer-explorer.vercel.app/address/0x07509a821D981379Ba57e10551AF2FDc3cb7ee7f](https://genlayer-explorer.vercel.app/address/0x07509a821D981379Ba57e10551AF2FDc3cb7ee7f)
 - **GitHub Repository**: [https://github.com/tuannguyen1995/polyglot-vault-genlayer](https://github.com/tuannguyen1995/polyglot-vault-genlayer)
 - **GenLayer Studio**: [https://studio.genlayer.com](https://studio.genlayer.com)
 
