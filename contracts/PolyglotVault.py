@@ -36,10 +36,17 @@ class Contract(gl.Contract):
         self.platform_admin = str(gl.message.sender_address).lower()
 
     def _get_current_timestamp(self) -> bigint:
-        dt = gl.message_raw["datetime"]
-        from datetime import datetime
-        ts = int(datetime.fromisoformat(dt.replace("Z", "+00:00")).timestamp())
-        return bigint(ts)
+        try:
+            dt = gl.message_raw.get("datetime", "")
+            if not dt:
+                raise UserError("Missing datetime header in transaction context")
+            from datetime import datetime
+            ts = int(datetime.fromisoformat(str(dt).replace("Z", "+00:00")).timestamp())
+            return bigint(ts)
+        except UserError:
+            raise
+        except Exception as e:
+            raise UserError(f"Failed to parse datetime from transaction context: {str(e)}")
 
     def _parse_llm_json(self, response_str: str) -> dict:
         try:
