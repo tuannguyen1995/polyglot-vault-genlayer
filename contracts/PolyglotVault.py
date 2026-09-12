@@ -31,6 +31,7 @@ class Contract(gl.Contract):
     platform_admin: str
     tasks: TreeMap[str, Task]
     task_ids: DynArray[str]
+    reputation: TreeMap[str, bigint]
 
     def __init__(self):
         self.platform_admin = str(gl.message.sender_address).lower()
@@ -59,20 +60,29 @@ class Contract(gl.Contract):
                 return {"verdict": "ESCALATE", "confidence": 0, "reason": "Failed to parse AI output."}
 
     @gl.public.view
+    def get_translator_reputation(self, translator_addr: str) -> bigint:
+        """Returns the on-chain reputation score of a translator."""
+        addr = translator_addr.lower()
+        if addr in self.reputation:
+            return self.reputation[addr]
+        return bigint(0)
+
+    @gl.public.view
     def get_platform_info(self) -> str:
-        """Returns protocol metadata, version and active security hardening profile."""
+        """Returns protocol metadata, milestone version, and active security features."""
         info = {
             "protocol": "PolyglotVault",
             "version": "v1.1.0-milestone1",
             "platform_admin": self.platform_admin,
             "total_tasks": len(self.task_ids),
             "consensus_engine": "GenVM Optimistic Democracy (Multi-Perspective)",
-            "security_features": [
+            "features": [
                 "Canary Prompt Injection Defense",
-                "3-Pillar Linguistic & Timing Adjudication",
+                "3-Pillar Linguistic Adjudication (Nuance, Timing, Constraints)",
+                "On-Chain Translator Reputation Tracking",
                 "20% Slashing Collateral Mechanism",
                 "48h Deadline Auto-Slashing",
-                "24h Cooling-off Dispute Transition"
+                "24h Dispute Cooling-Off Window"
             ]
         }
         return json.dumps(info)
@@ -155,6 +165,12 @@ class Contract(gl.Contract):
         task.status = "CLOSED"
         task.escrow_amount = bigint(0)
         task.translator_stake = bigint(0)
+
+        # Deduct reputation on abandonment
+        trans = task.translator
+        if trans in self.reputation:
+            cur = self.reputation[trans]
+            self.reputation[trans] = cur - bigint(5) if cur > bigint(5) else bigint(0)
 
         gl.get_contract_at(Address(task.publisher)).emit_transfer(value=u256(total_slash))
         self.tasks[task_id] = task
@@ -258,11 +274,9 @@ Respond ONLY with valid JSON:
             eff_lead = "ESCALATE" if c_lead < 65 else v_lead
             eff_mine = "ESCALATE" if c_mine < 65 else v_mine
 
-            # Check verdict agreement
             if eff_lead != eff_mine:
                 return False
 
-            # Check prompt injection consensus
             lead_injected = "[PROMPT_INJECTION_DETECTED]" in str(leader_data.get("reason", ""))
             mine_injected = "[PROMPT_INJECTION_DETECTED]" in str(mine_data.get("reason", ""))
             if lead_injected != mine_injected:
@@ -300,6 +314,13 @@ Respond ONLY with valid JSON:
                 total_refund = task.escrow_amount + task.translator_stake
                 task.escrow_amount = bigint(0)
                 task.translator_stake = bigint(0)
+
+                # Penalize reputation on double failure
+                trans = task.translator
+                if trans in self.reputation:
+                    cur = self.reputation[trans]
+                    self.reputation[trans] = cur - bigint(5) if cur > bigint(5) else bigint(0)
+
                 gl.get_contract_at(Address(task.publisher)).emit_transfer(value=u256(total_refund))
         else:
             task.status = "ESCALATED"
@@ -355,9 +376,15 @@ Respond ONLY with valid JSON:
         task.escrow_amount = bigint(0)
         task.translator_stake = bigint(0)
 
+        # On-Chain Reputation Update
+        trans = task.translator
+        cur_rep = self.reputation[trans] if trans in self.reputation else bigint(0)
+
         if task.verdict == "APPROVED":
+            self.reputation[trans] = cur_rep + bigint(10)
             gl.get_contract_at(Address(task.translator)).emit_transfer(value=u256(escrow + stake))
         elif task.verdict == "PARTIAL":
+            self.reputation[trans] = cur_rep + bigint(5)
             half = escrow // bigint(2)
             rem = escrow - half
             gl.get_contract_at(Address(task.translator)).emit_transfer(value=u256(half + stake))

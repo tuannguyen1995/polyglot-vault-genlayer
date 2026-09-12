@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [1.1.0] - 2026-09-12 (Milestone 1: AI Consensus Hardening & Security Pack)
 
 ### 🚀 Major Feature & AI Enhancements (GenLayer Milestone 1)
+- **New Contract Deployment (Studionet)**: Deployed upgraded contract at [`0x3544D7d49B35c5c9aAB542CFeBF8F1E9589e5a92`](https://genlayer-explorer.vercel.app/address/0x3544D7d49B35c5c9aAB542CFeBF8F1E9589e5a92).
+- **On-Chain Translator Reputation Engine**: Implemented reputation scoring storage (`reputation: TreeMap[str, bigint]`) awarding +10 reputation for approved translations, +5 for partial, and penalizing -5 for abandoned/slashed tasks with public view `get_translator_reputation`.
 - **Canary Prompt Injection Defense**: Implemented cryptographic-style Canary token verification (`POLYGLOT_SEC_CANARY_8912`) and adversarial defense instructions in `PolyglotVault.py` to neutralize prompt injection attacks targeting GenVM validators.
 - **3-Pillar Multi-Perspective Adjudication**: Upgraded consensus prompt to evaluate 3 independent linguistic dimensions:
   1. *Semantic & Cultural Nuance* (idiomatic localization, character tone fidelity).
@@ -23,7 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   - System Component Context
   - GenLayer Optimistic Democracy Consensus Pipeline
   - Complete Task Lifecycle State Machine
-- **Adversarial Unit Test Suite**: Expanded Python unit tests from 6 to 11 comprehensive tests in `tests/test_polyglot_vault.py` covering prompt injection detection, deadline slashing, and dispute transitions.
+- **Adversarial Unit Test Suite**: Expanded Python unit tests from 6 to 12 comprehensive tests in `tests/test_polyglot_vault.py` covering prompt injection detection, deadline slashing, reputation tracking, and dispute transitions.
 
 ### 🖥️ Frontend & UX Overhaul
 - **Multi-Pillar Visual Breakdown**: Added visual consensus breakdown cards displaying Semantic Nuance, Timing Pacing, and Quiz Compliance meters.

@@ -91,6 +91,7 @@ class TestPolyglotVaultAdversarialSuite(unittest.TestCase):
         self.contract = contract_module.Contract()
         self.contract.tasks = {}
         self.contract.task_ids = []
+        self.contract.reputation = {}
         self.contract.platform_admin = self.admin.lower()
 
         # Task setup: 1000 GEN escrow
@@ -283,6 +284,22 @@ class TestPolyglotVaultAdversarialSuite(unittest.TestCase):
         self.assertEqual(info["protocol"], "PolyglotVault")
         self.assertEqual(info["version"], "v1.1.0-milestone1")
         self.assertEqual(info["total_tasks"], 1)
+
+    def test_12_reputation_tracking(self):
+        """Approved translation grants +10 reputation to translator."""
+        self.gl.message.sender_address = self.trans
+        self.gl.message.value = MockBigInt(200)
+        self.contract.accept_task(self.tid)
+
+        self.gl.nondet.web.render = lambda url, mode="text": "Subtitles file"
+        self.gl.nondet.exec_prompt = lambda p, response_format="json": {"verdict": "APPROVED", "confidence": 98, "reason": "Flawless"}
+        self.contract.submit_deliverable(self.tid, "https://storage.com/subs.srt")
+        
+        self.gl.message_raw = {"datetime": "2026-08-20T00:01:00+00:00"}
+        self.contract.finalize_payout(self.tid)
+        
+        rep = self.contract.get_translator_reputation(self.trans)
+        self.assertEqual(rep, 10)
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

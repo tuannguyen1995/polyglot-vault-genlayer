@@ -13,8 +13,8 @@
 ## 🔗 Live Deployments & Documentation
 
 - **Live Production dApp**: [https://polyglot-vault-genlayer.vercel.app](https://polyglot-vault-genlayer.vercel.app)
-- **Deployed Intelligent Contract (Studionet)**: [`0x07509a821D981379Ba57e10551AF2FDc3cb7ee7f`](https://genlayer-explorer.vercel.app/address/0x07509a821D981379Ba57e10551AF2FDc3cb7ee7f)
-- **GenLayer Explorer Link**: [https://genlayer-explorer.vercel.app/address/0x07509a821D981379Ba57e10551AF2FDc3cb7ee7f](https://genlayer-explorer.vercel.app/address/0x07509a821D981379Ba57e10551AF2FDc3cb7ee7f)
+- **Deployed Intelligent Contract (Studionet)**: [`0x3544D7d49B35c5c9aAB542CFeBF8F1E9589e5a92`](https://genlayer-explorer.vercel.app/address/0x3544D7d49B35c5c9aAB542CFeBF8F1E9589e5a92)
+- **GenLayer Explorer Link**: [https://genlayer-explorer.vercel.app/address/0x3544D7d49B35c5c9aAB542CFeBF8F1E9589e5a92](https://genlayer-explorer.vercel.app/address/0x3544D7d49B35c5c9aAB542CFeBF8F1E9589e5a92)
 - **GitHub Repository**: [https://github.com/tuannguyen1995/polyglot-vault-genlayer](https://github.com/tuannguyen1995/polyglot-vault-genlayer)
 - **Changelog & Milestones**: [CHANGELOG.md](CHANGELOG.md)
 - **Security Policy & Threat Model**: [SECURITY.md](SECURITY.md)
