@@ -16,6 +16,9 @@ export function Navbar({ walletAddress, onConnectWallet, onDisconnectWallet, onO
               <Cpu className="w-3 h-3 animate-pulse" />
               GenLayer
             </span>
+            <span className="px-2 py-0.5 text-[10px] font-mono rounded-full bg-cyber-purple/10 text-cyber-purple border border-cyber-purple/30 items-center gap-1 uppercase tracking-widest hidden md:flex">
+              🛡️ v1.1.0 M1
+            </span>
           </div>
         </div>
 

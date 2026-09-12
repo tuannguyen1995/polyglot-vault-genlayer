@@ -83,8 +83,21 @@ async function runAudit() {
   console.log('      Verdict:', task.verdict);
   console.log('      Reason:', task.reason);
 
+  if (task.status === 'AWAITING_PAYOUT') {
+    console.log(`4. Testing Raise Dispute Transition (AWAITING_PAYOUT -> DISPUTED)...`);
+    const txDispute = await clientPub.writeContract({
+      address: CONTRACT_ADDRESS,
+      functionName: 'raise_dispute',
+      args: [taskId, 'Quality check failed on specialized terms'],
+    });
+    console.log('   Tx Hash:', txDispute);
+
+    task = await waitForTaskState(taskId, t => t.status === 'DISPUTED');
+    console.log('   ✅ Verification: Task transitioned to DISPUTED status. Finalization blocked!');
+  }
+
   if (task.status === 'ESCALATED' || task.status === 'DISPUTED') {
-    console.log(`4. Testing KOL Voluntary Release Arbitration...`);
+    console.log(`5. Testing KOL Voluntary Release Arbitration...`);
     const tx4 = await clientPub.writeContract({
       address: CONTRACT_ADDRESS,
       functionName: 'resolve_escalation',
